@@ -1,0 +1,211 @@
+---
+name: k4k8s_deploy
+"on":
+  push:
+    branches:
+      - "main"
+      - "dev"
+    paths:
+      - ".github/workflows/k4k8s-deploy-ci.yml"
+      - "roles/k4k8s_deploy/**"
+      - "!roles/k4k8s_deploy/README.md"
+      - "!README.md"
+      - "tests/integration/integration_config.yml"
+      - "tests/integration/targets/test-k4k8s-deploy/**"
+      - "tests/integration/targets/microk8s/**"
+      - "tests/integration/targets/microshift/**"
+  workflow_dispatch:
+
+env:
+  WORKING_DIR: "${{ github.workspace }}/ansible_collections/kong/kong"
+  KUBECONFIG_DIR: "${{ github.workspace }}/ansible_collections/kong/kong/kube"
+  KUBECONFIG_FILE: "${{ github.workspace }}/ansible_collections/kong/kong/kube/config"
+  DEFAULT_KUBECONFIG: "$HOME/.kube/config"
+  INTEGRATION_CONFIG: "${{ github.workspace }}/ansible_collections/kong/kong/tests/integration/integration_config.yml"
+  MICROSHIFT_KUBECONFIG: "/var/lib/microshift/resources/kubeadmin/kubeconfig"
+  TEST_CONTAINER_KUBECONFIG: "/root/ansible_collections/kong/kong/kube/config"
+  K8S_PY_DEPS: "k8s_requirements.txt"
+  LIN_PY_DEPS: "lin_requirements.txt"
+
+jobs:
+  ansible-sanity-test:
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Install repository as Ansible Collection
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.WORKING_DIR }}
+      - name: Run Ansible sanity test on Collection
+        run: ansible-test sanity
+  
+  openshift-test:
+    needs: ansible-sanity-test
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        operating_system:
+          - "centos8"
+          - "ubuntu1804"
+          - "ubuntu2004"
+          - "opensuse15"
+        deploy_method:
+          - "helm"
+          - "yaml_manifest"
+        values_location:
+          - "remote_values"
+          - "local_values"
+        exclude:
+          # only run the remote_values test on ubuntu1804, 1 is good enough here
+          - operating_system: "centos8"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "centos8"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    services:
+      microshift:
+        image: "quay.io/microshift/microshift-aio:latest"
+        options: >-
+          --name microshift
+          --privileged
+        volumes:
+          - microshift-data:/var/lib
+        ports:
+          - 6443:6443
+    steps:
+      - name: Integration test setup | Install repository as Ansible Collection
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.WORKING_DIR }}
+
+      - name: Integration test setup | Get microshift kubeconfig
+        run: |
+          sleep 15
+          mkdir ${{ env.KUBECONFIG_DIR }}
+          docker cp microshift:${{ env.MICROSHIFT_KUBECONFIG }} ${{ env.KUBECONFIG_FILE }}
+          chown -f -R $USER ${{ env.KUBECONFIG_DIR }}
+          chmod 600 ${{ env.KUBECONFIG_FILE }}
+          cp -R ${{ env.KUBECONFIG_DIR }} "$HOME/.kube"
+
+      - name: Integration test | openshift cluster readiness
+        run: ansible-test integration --color yes microshift
+
+      - name: Integration test setup | Capture 'microshift' docker container IP and docker bridge network
+        run: |
+          DOCKER_NET=`docker network ls | awk '{print $2}' | grep github`
+          echo "DOCKER_NETWORK=$DOCKER_NET" >> $GITHUB_ENV
+          DOCKER_CONTAINER=`docker network inspect $DOCKER_NET | jq '.[0].Containers[] | select(.Name == "microshift").IPv4Address' | sed 's/"//g' | sed 's/\/.*//'`
+          echo $DOCKER_CONTAINER
+          echo "k8s_instance: $DOCKER_CONTAINER" >> ${{ env.INTEGRATION_CONFIG }}
+
+      - name: Integration test setup | Ensure integration test config has kubeconfig and kong enterprise license
+        run: |
+          echo "local_kubeconfig: ${{ env.TEST_CONTAINER_KUBECONFIG }}" >> ${{ env.INTEGRATION_CONFIG }}
+          echo "k4k8s_deploy_enterprise_license_json_string: ${{ secrets.KONG_ENTERPRISE_JSON_LICENSE }}" >> ${{ env.INTEGRATION_CONFIG }}
+      
+      - name: Integration test setup | Ensure deployment method is set
+        run: |
+          echo "deploy_method: ${{ matrix.deploy_method }}" >> ${{ env.INTEGRATION_CONFIG }}
+      
+      - name: Integration test setup | Ensure files and values location is set
+        run: |
+          echo "values_location: ${{ matrix.values_location }}" >> ${{ env.INTEGRATION_CONFIG }}
+
+      - name: Integration test | Ansible integration test for ${{ matrix.operating_system }}
+        run: ansible-test integration --controller docker:default --target docker:${{ matrix.operating_system }} --docker-network "${{ env.DOCKER_NETWORK }}" --color yes --skip-tags "skip_for_test" test-k4k8s-deploy
+  
+  kubernetes-test:
+    needs: ansible-sanity-test
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        operating_system:
+          - "centos8"
+          - "ubuntu1804"
+          - "ubuntu2004"
+          - "opensuse15"
+        deploy_method:
+          - "helm"
+          - "yaml_manifest"
+        values_location:
+          - "remote_values"
+          - "local_values"
+        exclude:
+          # only run the remote_values test on ubuntu1804, 1 is good enough here
+          - operating_system: "centos8"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "centos8"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            deploy_method: "helm"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            deploy_method: "yaml_manifest"
+            values_location: "remote_values"
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Integration test setup | Install repository as Ansible Collection
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.WORKING_DIR }}
+
+      - name: Integation test setup | Start kubernetes testing environment
+        uses: balchua/microk8s-actions@v0.2.2
+        with:
+          channel: "latest/stable"
+          addons: '["dns", "rbac", "hostpath-storage"]'
+
+      - name: Integration test setup | Get microk8s kubeconfig
+        run: mkdir ${{ env.KUBECONFIG_DIR }} && cp ${{ env.DEFAULT_KUBECONFIG }} ${{ env.KUBECONFIG_FILE }} && chown -f -R $USER ${{ env.KUBECONFIG_DIR }} && chmod 600 ${{ env.KUBECONFIG_FILE }}
+
+      - name: Integration test | Kubernetes cluster readiness
+        run: ansible-test integration --color yes microk8s
+
+      - name: Integration test setup | Ensure integration test config has k8s_instance for microk8s
+        # seems the bridge gateway is always the same, so we'll just hardcode this for now
+        run: |
+          echo "k8s_instance: 172.17.0.1" >> ${{ env.INTEGRATION_CONFIG }}
+
+      - name: Integration test setup | Ensure integration test config has kubeconfig and kong enterprise license
+        run: |
+          echo "local_kubeconfig: ${{ env.TEST_CONTAINER_KUBECONFIG }}" >> ${{ env.INTEGRATION_CONFIG }}
+          echo "k4k8s_deploy_enterprise_license_json_string: ${{ secrets.KONG_ENTERPRISE_JSON_LICENSE }}" >> ${{ env.INTEGRATION_CONFIG }}
+
+      - name: Integration test setup | Ensure deployment method is set
+        run: |
+          echo "deploy_method: ${{ matrix.deploy_method }}" >> ${{ env.INTEGRATION_CONFIG }}
+      
+      - name: Integration test setup | Ensure files and values location is set
+        run: |
+          echo "values_location: ${{ matrix.values_location }}" >> ${{ env.INTEGRATION_CONFIG }}
+
+      - name: Integration test | Ansible integration test for ${{ matrix.operating_system }}
+        run: ansible-test integration --controller docker:default --target docker:${{ matrix.operating_system }} --color yes --skip-tags "skip_for_test" test-k4k8s-deploy

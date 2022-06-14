@@ -1,0 +1,35 @@
+---
+- name: "Validate ansible collections are installed"
+  delegate_to: "localhost"
+  block:
+    # unfortunately, there isn't an ansible_galaxy_info module
+    - name: "Collect installed ansible collection dependencies"
+      ansible.builtin.command: "{{ k4k8s_deploy_ansible_galaxy_executable_path }} collection list"
+      changed_when: False
+      register: "__k4k8s_deploy_ansible_galaxy_results__"
+
+    - name: "Set initial ansible collection validation status"
+      ansible.builtin.set_fact:
+        __k4k8s_deploy_ansible_collection_chk__: []
+        __k4k8s_deploy_installed_ansible_collections__: []
+    
+    - name: "Sanitize collected ansible collection data"
+      ansible.builtin.include_tasks: "validate/sanitize_ansible_collection_data.yml"
+      with_items: "{{ __k4k8s_deploy_ansible_galaxy_results__.stdout_lines }}"
+      loop_control:
+        loop_var: "__k4k8s_deploy_galaxy_output_line__"
+    
+    - name: "Validate binary dependencies are installed"
+      ansible.builtin.include_tasks: "validate/chk_ansible_collection_prereqs.yml"
+      with_items: "{{ k4k8s_deploy_ansible_collection_deps }}"
+      loop_control:
+        loop_var: "__k4k8s_deploy_ansible_collection__"
+
+    - name: "Fail due to missing requisite ansible collections"
+      ansible.builtin.fail:
+        msg: "The following ansible collections are not found on the ansible control node: {{ __k84k8s_deploy_ansible_collection_chk__ }}"
+      when: "__k4k8s_deploy_ansible_collection_chk__ | length > 0"
+    
+    - name: "Ansible collection validation complete"
+      ansible.builtin.debug:
+        msg: "All requisite ansible collections are available"

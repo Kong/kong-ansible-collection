@@ -1,0 +1,62 @@
+---
+- name: "Ensure python dependencies are installed"
+  include_role: 
+    name: "k4k8s_deploy"
+    tasks_from: "prerequisite_install/py_prereqs"
+  vars:
+    k4k8s_deploy_python_module_deps:
+      - "kubernetes"
+    k4k8s_deploy_python_package_manager: "pipx"
+    k4k8s_deploy_pipx_package: "ansible-core"
+
+- name: "Ensure OpenShift environment is in ready state"
+  module_defaults:
+    kubernetes.core.k8s_info:
+      wait: True
+      wait_timeout: 600
+      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+    kubernetes.core.k8s:
+      wait: True
+      wait_timeout: 600
+      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+  block:
+    - name: "Ensure 'kube-flannel-ds' DaemonSet status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "DaemonSet"
+        name: "kube-flannel-ds"
+        namespace: "kube-system"
+    
+    - name: "Ensure 'kubevirt-hostpath-provisioner' DaemonSet status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "DaemonSet"
+        name: "kubevirt-hostpath-provisioner"
+        namespace: "kubevirt-hostpath-provisioner"
+    
+    - name: "Ensure 'dns-default' DaemonSet status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "DaemonSet"
+        name: "dns-default"
+        namespace: "openshift-dns"
+    
+    - name: "Ensure 'node-resolver' DaemonSet status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "DaemonSet"
+        name: "node-resolver"
+        namespace: "openshift-dns"
+
+    - name: "Ensure 'router-default' Deployment status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "Deployment"
+        name: "router-default"
+        namespace: "openshift-ingress"
+
+    - name: "Ensure 'service-ca' Deployment status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "Deployment"
+        name: "service-ca"
+        namespace: "openshift-service-ca"
+    
+    - debug:
+        msg: "OpenShift LGTM"

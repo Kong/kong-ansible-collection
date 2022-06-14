@@ -1,0 +1,19 @@
+---
+- name: "Ensure package repositories are present"
+  community.general.zypper_repository:
+    auto_import_keys: "{{ repo.import_keys }}"
+    autorefresh: "{{ repo.autorefresh }}"
+    description: "{{ repo.description }}"
+    disable_gpg_check: "{{ repo.disable_gpg_check }}"
+    enabled: "{{ repo.enabled }}"
+    name: "{{ repo.name }}"
+    overwrite_multiple: "{{ repo.overwrite_multiple }}"
+    repo: "{{ repo.repo }}"
+    runrefresh: "{{ repo.runrefresh }}"
+    state: "{{ repo.state }}"
+  with_items: "{{ k4k8s_deploy_install_pkg_repos }}"
+  loop_control:
+    loop_var: "repo"
+  when: 
+    - "ansible_distribution == 'openSUSE Leap'"
+  become: True

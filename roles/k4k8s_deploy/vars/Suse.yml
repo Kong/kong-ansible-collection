@@ -1,0 +1,14 @@
+---
+k4k8s_deploy_install_bin_pkgs: []
+
+k4k8s_deploy_install_pkg_repos: []
+  # - name: "kubernetes"
+  #   description: "Kubernetes"
+  #   import_keys: True
+  #   autorefresh: True
+  #   disable_gpg_check: False
+  #   enabled: True
+  #   overwrite_multiple: False
+  #   repo: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+  #   runrefresh: True
+  #   state: "present"

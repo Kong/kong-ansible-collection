@@ -1,0 +1,19 @@
+---
+- name: "Set initial binary validation status"
+  ansible.builtin.set_fact:
+    __k4k8s_deploy_binary_chk__: []
+
+- name: "Validate binary dependencies are installed"
+  ansible.builtin.include_tasks: "validate/chk_bin_prereqs.yml"
+  with_items: "{{ k4k8s_deploy_bin_deps }}"
+  loop_control:
+    loop_var: "__k4k8s_deploy_bin__"
+
+- name: "Fail due to missing requisite binaries"
+  ansible.builtin.fail:
+    msg: "The following required binaries are not found on the system: {{ __k4k8s_deploy_binary_chk__ | join(',') }}"
+  when: "__k4k8s_deploy_binary_chk__ | length > 0"
+
+- name: "Binary validation complete"
+  ansible.builtin.debug:
+    msg: "All requisite binaries are available"

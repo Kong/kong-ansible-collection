@@ -1,0 +1,62 @@
+---
+# following 2 vars used to a) setup remote files/values test and b) just work for local files/values test c) overridden by include_vars for remote files/values
+k4k8s_deploy_helm_chart_values_files:
+  - "values.yaml"
+k4k8s_deploy_yaml_manifest_paths:
+  - "yamls/cluster-role-binding.yaml"
+  - "yamls/cluster-role.yaml"
+  - "yamls/ingress-class.yaml"
+  - "yamls/init-migrations.yaml"
+  - "yamls/kong-admin-svc.yaml"
+  - "yamls/kong-manager-svc.yaml"
+  - "yamls/kong-portal-svc.yaml"
+  - "yamls/kong-portalapi-svc.yaml"
+  - "yamls/kong-proxy-svc.yaml"
+  - "yamls/postgres-statefulset.yaml"
+  - "yamls/postgres-svc.yaml"
+  - "yamls/postgres-svc1.yaml"
+  - "yamls/role-binding.yaml"
+  - "yamls/role.yaml"
+  - "yamls/service-account.yaml"
+  - "yamls/wait-for-postgres.yaml"
+  - "yamls/kong-deployment.yaml"
+
+# Test deployment mechanism ("helm" | "yaml_manifest")
+k4k8s_deploy_method: "{{ deploy_method }}" # passed from GH actions matrix
+
+# Test all install mechanisms
+k4k8s_deploy_install_binary_dependencies: True
+k4k8s_deploy_install_python_dependencies: True
+k4k8s_deploy_install_ansible_collection_dependencies: True
+
+# Test all secret creation mechanisms
+k4k8s_deploy_create_enterprise_superuser_password_secret: True
+k4k8s_deploy_create_enterprise_license_secret: True
+k4k8s_deploy_create_hybrid_mode_cp_cert_secret: True
+k4k8s_deploy_create_hybrid_mode_dp_cert_secret: True
+k4k8s_deploy_create_admin_gui_sessions_conf_secret: True
+k4k8s_deploy_create_portal_sessions_conf_secret: True
+k4k8s_deploy_create_postgres_password_secret: True
+k4k8s_deploy_admin_gui_sessions_settings:
+  cookie_lifetime: 3600
+  cookie_name: "please-change-me"
+  cookie_renew: 600
+  cookie_samesite: "off"
+  cookie_secure: false
+  secret: "please-change-me"
+  storage: "cookie"
+k4k8s_deploy_portal_sessions_settings:
+  cookie_domain: ".dev.mydomain.com"
+  cookie_lifetime: 3600
+  cookie_name: "please-change-me"
+  cookie_renew: 600
+  cookie_samesite: "off"
+  cookie_secure: false
+  secret: "please-change-me"
+  storage: "cookie"
+
+
+# Test recursive helm values override mechanism
+k4k8s_deploy_helm_chart_values: # override admin_api_uri
+  env:
+    admin_api_uri: "http://{{ k8s_instance }}:30433" # nodeport forced in values file

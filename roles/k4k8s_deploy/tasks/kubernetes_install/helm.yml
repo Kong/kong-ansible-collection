@@ -1,0 +1,33 @@
+---
+- name: "Ensure kong helm chart repository is present"
+  kubernetes.core.helm_repository:
+    binary_path: "{{ k4k8s_deploy_helm_binary_path }}"
+    repo_name: "{{ k4k8s_deploy_helm_chart_repo_name }}"
+    repo_password: "{{ k4k8s_deploy_helm_chart_repo_password | default(omit) }}"
+    repo_state: "present"
+    repo_url: "{{ k4k8s_deploy_helm_chart_repo_url }}"
+    repo_username: "{{ k4k8s_deploy_helm_chart_repo_username | default(omit) }}"
+
+- name: "Ensure provided helm chart values are available"
+  ansible.builtin.include_tasks: "kubernetes_install/helm_values/collect_helm_values.yml"
+
+- name: "Ensure kong for kubernetes is present | helm install"
+  kubernetes.core.helm:
+    atomic: "{{ k4k8s_deploy_helm_atomic }}"
+    binary_path: "{{ k4k8s_deploy_helm_binary_path }}"
+    chart_ref: "{{ k4k8s_deploy_helm_chart_ref }}"
+    chart_version: "{{ k4k8s_deploy_helm_chart_version | default(omit) }}"
+    context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+    create_namespace: False
+    disable_hook: "{{ k4k8s_deploy_helm_disable_hook }}"
+    force: "{{ k4k8s_deploy_helm_force_reinstall }}"
+    kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+    release_name: "{{ k4k8s_deploy_helm_release_name }}"
+    release_namespace: "{{ k4k8s_deploy_namespace }}"
+    release_state: "present"
+    release_values: "{{ __k4k8s_deploy_helm_release_values__ }}"
+    replace: "{{ k4k8s_deploy_helm_replace }}"
+    skip_crds: False
+    update_repo_cache: "{{ k4k8s_deploy_helm_update_repo }}"
+    wait: "{{ k4k8s_deploy_helm_wait }}"
+  register: "__k4k8s_deploy_helm_results__"

@@ -1,0 +1,41 @@
+---
+- name: "Ensure OS specific variables are included"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: "Ensure package repositories are configured"
+  ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - "{{ role_path }}/tasks/prerequisite_install/pkg_repo"
+  when:
+    - "k4k8s_deploy_install_pkg_repos | length > 0"
+    - "k4k8s_deploy_install_bin_pkgs | length > 0"
+
+- name: "Ensure binary package prerequisites are present"
+  ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
+  with_items: "{{ k4k8s_deploy_bin_pkgs }}"
+  loop_control:
+    loop_var: "__k4k8s_deploy_bin_pkg__"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - "{{ role_path }}/tasks/prerequisite_install/pkg"
+  when: "k4k8s_deploy_install_bin_pkgs | length > 0"
+
+- name: "Ensure binary tarball prerequisites are present"
+  ansible.builtin.include_tasks: "prerequisite_install/tarball/call_install_tarball.yml"
+  when: "k4k8s_deploy_install_bin_tarballs | length > 0"

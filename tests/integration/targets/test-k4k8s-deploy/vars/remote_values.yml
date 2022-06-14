@@ -1,0 +1,26 @@
+---
+# Test remote file/values locations
+k4k8s_deploy_helm_chart_values_remote: True
+k4k8s_deploy_yaml_manifest_paths_remote: True
+
+# override initial paths for remote test setup that are loaded from vars/common.yml
+k4k8s_deploy_helm_chart_values_files:
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/values.yaml"
+k4k8s_deploy_yaml_manifest_paths:
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/cluster-role-binding.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/cluster-role.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/ingress-class.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/init-migrations.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-admin-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-manager-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-portal-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-portalapi-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-proxy-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/postgres-statefulset.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/postgres-svc.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/postgres-svc1.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/role-binding.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/role.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/service-account.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/wait-for-postgres.yaml"
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/kong-deployment.yaml"

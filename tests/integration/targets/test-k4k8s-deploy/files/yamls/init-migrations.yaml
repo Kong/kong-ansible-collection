@@ -1,0 +1,245 @@
+---
+# Source: kong/templates/migrations.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-kong-init-migrations
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.8.2
+    app.kubernetes.io/instance: "kong"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.8"
+    app.kubernetes.io/component: init-migrations
+  annotations: {}
+spec:
+  template:
+    metadata:
+      name: kong-init-migrations
+      labels:
+        app.kubernetes.io/name: kong
+        helm.sh/chart: kong-2.8.2
+        app.kubernetes.io/instance: "kong"
+        app.kubernetes.io/managed-by: "Helm"
+        app.kubernetes.io/version: "2.8"
+        app.kubernetes.io/component: init-migrations
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: kong-kong
+      automountServiceAccountToken: true
+      initContainers:
+      - name: wait-for-postgres 
+        image: kong/kong-gateway:2.8.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+         
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_API_URI
+          value: "http://192.168.64.2:30433"
+        - name: KONG_ADMIN_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_GUI_AUTH
+          value: "basic-auth"
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_LISTEN
+          value: "0.0.0.0:8002, 0.0.0.0:8445 http2 ssl"
+        - name: KONG_ADMIN_GUI_SESSION_CONF
+          valueFrom:
+            secretKeyRef:
+              name: kong-session-config
+              key: admin_gui_session_conf
+        - name: KONG_ADMIN_LISTEN
+          value: "0.0.0.0:8001, 0.0.0.0:8444 http2 ssl"
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_CLUSTER_TELEMETRY_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: "postgres"
+        - name: KONG_ENFORCE_RBAC
+          value: "on"
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LICENSE_DATA
+          valueFrom:
+            secretKeyRef:
+              name: kong-enterprise-license
+              key: license
+        - name: KONG_LUA_PACKAGE_PATH
+          value: "/opt/?.lua;/opt/?/init.lua;;"
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: kong-enterprise-superuser-password
+        - name: KONG_PG_HOST
+          value: "kong-postgresql"
+        - name: KONG_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kong-postgresql
+              key: password
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_USER
+          value: "kong"
+        - name: KONG_PLUGINS
+          value: "bundled"
+        - name: KONG_PORTAL
+          value: "on"
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PORTAL_API_LISTEN
+          value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
+        - name: KONG_PORTAL_GUI_LISTEN
+          value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
+        - name: KONG_PORT_MAPS
+          value: "80:8000, 443:8443"
+        - name: KONG_PREFIX
+          value: "/kong_prefix/"
+        - name: KONG_PROXY_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PROXY_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PROXY_LISTEN
+          value: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+        - name: KONG_SMTP_MOCK
+          value: "on"
+        - name: KONG_STATUS_LISTEN
+          value: "0.0.0.0:8100"
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        command: [ "bash", "/wait_postgres/wait.sh" ]
+        volumeMounts:
+        - name: kong-kong-bash-wait-for-postgres
+          mountPath: /wait_postgres
+        resources:
+          {}
+      containers:
+      - name: kong-migrations
+        image: kong/kong-gateway:2.8.1.0
+        imagePullPolicy: IfNotPresent
+        securityContext:
+        
+          {} 
+        env:
+         
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_API_URI
+          value: "http://192.168.64.2:30433"
+        - name: KONG_ADMIN_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_GUI_AUTH
+          value: "basic-auth"
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_GUI_LISTEN
+          value: "0.0.0.0:8002, 0.0.0.0:8445 http2 ssl"
+        - name: KONG_ADMIN_GUI_SESSION_CONF
+          valueFrom:
+            secretKeyRef:
+              name: kong-session-config
+              key: admin_gui_session_conf
+        - name: KONG_ADMIN_LISTEN
+          value: "0.0.0.0:8001, 0.0.0.0:8444 http2 ssl"
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_CLUSTER_TELEMETRY_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: "postgres"
+        - name: KONG_ENFORCE_RBAC
+          value: "on"
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LICENSE_DATA
+          valueFrom:
+            secretKeyRef:
+              name: kong-enterprise-license
+              key: license
+        - name: KONG_LUA_PACKAGE_PATH
+          value: "/opt/?.lua;/opt/?/init.lua;;"
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: kong-enterprise-superuser-password
+        - name: KONG_PG_HOST
+          value: "kong-postgresql"
+        - name: KONG_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kong-postgresql
+              key: password
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_USER
+          value: "kong"
+        - name: KONG_PLUGINS
+          value: "bundled"
+        - name: KONG_PORTAL
+          value: "on"
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PORTAL_API_LISTEN
+          value: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
+        - name: KONG_PORTAL_GUI_LISTEN
+          value: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
+        - name: KONG_PORT_MAPS
+          value: "80:8000, 443:8443"
+        - name: KONG_PREFIX
+          value: "/kong_prefix/"
+        - name: KONG_PROXY_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PROXY_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_PROXY_LISTEN
+          value: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+        - name: KONG_SMTP_MOCK
+          value: "on"
+        - name: KONG_STATUS_LISTEN
+          value: "0.0.0.0:8100"
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        args: [ "kong", "migrations", "bootstrap" ]
+        volumeMounts:
+        - name: kong-kong-prefix-dir
+          mountPath: /kong_prefix/
+        - name: kong-kong-tmp
+          mountPath: /tmp
+        
+        resources:
+          {}
+      securityContext:
+        {}
+      restartPolicy: OnFailure
+      volumes:
+      - name: kong-kong-prefix-dir
+        emptyDir: {}
+      - name: kong-kong-tmp
+        emptyDir: {}
+      - name: kong-kong-bash-wait-for-postgres
+        configMap:
+          name: kong-kong-bash-wait-for-postgres
+          defaultMode: 0755

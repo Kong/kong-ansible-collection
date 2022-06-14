@@ -1,0 +1,7 @@
+- name: "Set sanitized ansible collection data"
+  ansible.builtin.set_fact:
+    __k4k8s_deploy_clean_ansible_collection_item__: ["{{ __k4k8s_deploy_galaxy_output_line__ | regex_replace(' .*', '') }}"]
+
+- name: "Append clean ansible collection data to ansible collection list"
+  ansible.builtin.set_fact:
+    __k4k8s_deploy_installed_ansible_collections__: "{{ __k4k8s_deploy_installed_ansible_collections__ | union(__k4k8s_deploy_clean_ansible_collection_item__) }}"

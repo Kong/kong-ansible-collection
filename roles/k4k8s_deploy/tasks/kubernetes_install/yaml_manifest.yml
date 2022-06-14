@@ -1,0 +1,34 @@
+---
+- name: "Ensure yaml manifests are present"
+  when: "not k4k8s_deploy_yaml_manifest_paths_remote | default(False) | bool"
+  block:
+    - name: "Ensure temporary directory for yaml manifests is present on {{ inventory_hostname }}"
+      ansible.builtin.tempfile:
+        state: "directory"
+        prefix: "k4k8s_deploy_manifests"
+      register: "__k4k8s_deploy_manifest_dir__"
+    
+    - name: "Ensure yaml manifests are present on {{ inventory_hostname }}"
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ __k4k8s_deploy_manifest_dir__.path }}/{{ item | basename }}"
+      with_items: "{{ k4k8s_deploy_yaml_manifest_paths }}"
+  
+    - name: "Ensure yaml manifests are applied"
+      ansible.builtin.include_tasks: "common/yaml_manifest_apply.yml"
+      with_items: "{{ k4k8s_deploy_yaml_manifest_paths }}"
+      loop_control:
+        loop_var: "__k4k8s_deploy_yaml_path__"
+
+  always:
+    - name: "Ensure temporary directory for yaml manifests is absent on {{ inventory_hostname }}"
+      ansible.builtin.file:
+        path: "{{ __k4k8s_deploy_manifest_dir__.path }}"
+        state: "absent"
+
+- name: "Ensure yaml manifest files are applied"
+  ansible.builtin.include_tasks: "common/yaml_manifest_apply.yml"
+  with_items: "{{ k4k8s_deploy_yaml_manifest_paths }}"
+  when: "k4k8s_deploy_yaml_manifest_paths_remote | default(False) | bool"
+  loop_control:
+    loop_var: "__k4k8s_deploy_yaml_path__"

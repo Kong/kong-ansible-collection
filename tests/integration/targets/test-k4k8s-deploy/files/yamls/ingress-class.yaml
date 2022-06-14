@@ -1,0 +1,14 @@
+---
+# Source: kong/templates/ingress-class.yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.8.2
+    app.kubernetes.io/instance: "kong"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.8"
+spec:
+  controller: ingress-controllers.konghq.com/kong

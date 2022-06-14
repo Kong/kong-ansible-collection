@@ -1,0 +1,30 @@
+---
+# Source: kong/templates/service-kong-portal.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-kong-portal
+  namespace: kong
+  labels:
+    app.kubernetes.io/name: kong
+    helm.sh/chart: kong-2.8.2
+    app.kubernetes.io/instance: "kong"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/version: "2.8"
+spec:
+  type: NodePort
+  ports:
+  - name: kong-portal
+    port: 8003
+    targetPort: 8003
+    appProtocol: http
+    protocol: TCP
+  - name: kong-portal-tls
+    port: 8446
+    targetPort: 8446
+    appProtocol: https
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: "kong"

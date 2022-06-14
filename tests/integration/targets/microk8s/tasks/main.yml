@@ -1,0 +1,50 @@
+---
+- name: "Ensure python dependencies are installed"
+  include_role:
+    name: "k4k8s_deploy"
+    tasks_from: "prerequisite_install/py_prereqs"
+  vars:
+    k4k8s_deploy_python_module_deps:
+      - "kubernetes"
+    k4k8s_deploy_python_package_manager: "pipx"
+    k4k8s_deploy_pipx_package: "ansible-core"
+
+- name: "Ensure Kubernetes environment is in ready state"
+  module_defaults:
+    kubernetes.core.k8s_info:
+      wait: True
+      wait_timeout: 600
+      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+    kubernetes.core.k8s:
+      wait: True
+      wait_timeout: 600
+      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+  block:
+    - name: "Ensure 'calico-node' DaemonSet status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "DaemonSet"
+        name: "calico-node"
+        namespace: "kube-system"
+
+    - name: "Ensure 'calico-kube-controllers' Deployment status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "Deployment"
+        name: "calico-kube-controllers"
+        namespace: "kube-system"
+
+    - name: "Ensure 'coredns' Deployment status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "Deployment"
+        name: "coredns"
+        namespace: "kube-system"
+    
+    - name: "Ensure 'hostpath-provisioner' Deployment status is 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: "Deployment"
+        name: "hostpath-provisioner"
+        namespace: "kube-system"
+
+    - debug:
+        msg: "Kubernetes LGTM"  
