@@ -1,7 +1,7 @@
 ---
 # Test remote file/values locations
-k4k8s_deploy_helm_chart_values_remote: True
-k4k8s_deploy_yaml_manifest_paths_remote: True
+k4k8s_deploy_helm_chart_values_remote: true
+k4k8s_deploy_yaml_manifest_paths_remote: true
 
 # override initial paths for remote test setup that are loaded from vars/common.yml
 k4k8s_deploy_helm_chart_values_files:

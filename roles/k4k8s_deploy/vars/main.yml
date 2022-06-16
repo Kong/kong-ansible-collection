@@ -4,13 +4,13 @@ k4k8s_deploy_python_module_deps:
   - "kubernetes"
 
 ## pip
-# k4k8s_deploy_pyvenv_path: "" # set if you need to specify your python virtual environment path for module installs
+# k4k8s_deploy_pyvenv_path: ""  # set if you need to specify your python virtual environment path for module installs
 k4k8s_deploy_pip_executable_path: "pip3"
 k4k8s_deploy_python_umask: "0022"
 
 
 ## pipx
-k4k8s_deploy_pipx_package: "ansible-core" # set to function within default GitHub Actions runners
+k4k8s_deploy_pipx_package: "ansible-core"  # set to function within default GitHub Actions runners
 k4k8s_deploy_pipx_executable_path: "pipx"
 
 # Ansible
@@ -21,7 +21,7 @@ k4k8s_deploy_ansible_collection_deps:
 k4k8s_deploy_ansible_collection_deps_hybrid_certs:
   - "community.crypto"
 
-#k4k8s_deploy_ansible_collection_path: ""
+# k4k8s_deploy_ansible_collection_path: ""
 k4k8s_deploy_ansible_galaxy_executable_path: "ansible-galaxy"
 
 # Binaries
@@ -54,7 +54,7 @@ k4k8s_deploy_install_bin_tarballs_helm_method:
 
 
 # Helm3
-k4k8s_deploy_helm_atomic: False
+k4k8s_deploy_helm_atomic: false
 k4k8s_deploy_helm_binary_path: "{{ k4k8s_deploy_bin_version_info['helm']['destination'] }}/helm"
 k4k8s_deploy_helm_chart_ref: "kong/kong"
 k4k8s_deploy_helm_chart_repo_name: "kong"
@@ -62,9 +62,9 @@ k4k8s_deploy_helm_chart_repo_url: "https://charts.konghq.com"
 # k4k8s_deploy_helm_chart_repo_username: ""
 # k4k8s_deploy_helm_chart_repo_password: ""
 # k4k8s_deploy_helm_chart_version: "v2.8.2"
-k4k8s_deploy_helm_disable_hook: False
-k4k8s_deploy_helm_force_reinstall: False
+k4k8s_deploy_helm_disable_hook: false
+k4k8s_deploy_helm_force_reinstall: false
 k4k8s_deploy_helm_release_name: "kong"
-k4k8s_deploy_helm_replace: False
-k4k8s_deploy_helm_update_repo: True
-k4k8s_deploy_helm_wait: True
+k4k8s_deploy_helm_replace: false
+k4k8s_deploy_helm_update_repo: true
+k4k8s_deploy_helm_wait: true

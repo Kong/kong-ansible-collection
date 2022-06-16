@@ -1,6 +1,6 @@
 ---
 - name: "Ensure apt repositories and keys are present"
-  become: True
+  become: true
   block:
     - name: "Ensure apt repository keys are present"
       ansible.builtin.apt_key:

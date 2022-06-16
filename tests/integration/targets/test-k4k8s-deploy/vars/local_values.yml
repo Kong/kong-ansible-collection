@@ -1,3 +1,3 @@
 ---
-k4k8s_deploy_helm_chart_values_remote: False
-k4k8s_deploy_yaml_manifest_paths_remote: False
+k4k8s_deploy_helm_chart_values_remote: false
+k4k8s_deploy_yaml_manifest_paths_remote: false

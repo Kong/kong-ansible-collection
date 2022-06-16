@@ -1,61 +1,61 @@
 ---
 # k4k8s-deploy role behavior config
-k4k8s_deploy_validate_python_dependencies: True
-k4k8s_deploy_install_python_dependencies: False
-k4k8s_deploy_python_package_manager: "pip" # pip | pipx
-k4k8s_deploy_validate_ansible_collection_dependencies: True
-k4k8s_deploy_install_ansible_collection_dependencies: False
-k4k8s_deploy_validate_binary_dependencies: True
-k4k8s_deploy_install_binary_dependencies: False
-k4k8s_deploy_method: "helm" # helm | yaml_manifest
+k4k8s_deploy_validate_python_dependencies: true
+k4k8s_deploy_install_python_dependencies: false
+k4k8s_deploy_python_package_manager: "pip"  # pip | pipx
+k4k8s_deploy_validate_ansible_collection_dependencies: true
+k4k8s_deploy_install_ansible_collection_dependencies: false
+k4k8s_deploy_validate_binary_dependencies: true
+k4k8s_deploy_install_binary_dependencies: false
+k4k8s_deploy_method: "helm"  # helm | yaml_manifest
 
 
 # k4k8s-deploy Helm3 config - set when k4k8s_deploy_method: "helm"
 k4k8s_deploy_helm_chart_values_files: []
-k4k8s_deploy_helm_chart_values_remote: False # Set to True when the k4k8s_deploy_helm_chart_values_files are stored on a remote target host (i.e. not ansible control node)
+k4k8s_deploy_helm_chart_values_remote: false  # Set to true when the k4k8s_deploy_helm_chart_values_files are stored on a remote target host (not control node)
 k4k8s_deploy_helm_chart_values: {}
 
 
 # k4k8s-deploy YAML Manifest config - set when k4k8s_deploy_method: "yaml_manifest"
 k4k8s_deploy_yaml_manifest_paths: []
-k4k8s_deploy_yaml_manifest_paths_remote: False # Set to True when the k4k8s_deploy_yaml_manifest_paths are stored on a remote target host (i.e. not ansible control node)
+k4k8s_deploy_yaml_manifest_paths_remote: false  # Set to True when the k4k8s_deploy_yaml_manifest_paths are stored on a remote target host (not control node)
 
 # k4k8s-deploy Kong config
-k4k8s_deploy_create_enterprise_license_secret: False
+k4k8s_deploy_create_enterprise_license_secret: false
 k4k8s_deploy_enterprise_license_secret_name: "kong-enterprise-license"
 k4k8s_deploy_enterprise_license_secret_key: "license"
 k4k8s_deploy_enterprise_license_json_string: '' # contents of your Kong Enterprise license file
-k4k8s_deploy_create_enterprise_superuser_password_secret: False
+k4k8s_deploy_create_enterprise_superuser_password_secret: false
 k4k8s_deploy_enterprise_superuser_password_secret_name: "kong-enterprise-superuser-password"
-k4k8s_deploy_enterprise_superuser_password: "cloudnative" # change this!
-k4k8s_deploy_create_hybrid_mode_cp_cert_secret: False
+k4k8s_deploy_enterprise_superuser_password: "cloudnative"  # change this!
+k4k8s_deploy_create_hybrid_mode_cp_cert_secret: false
 k4k8s_deploy_hybrid_mode_cert_secret_name: "kong-cluster-cert"
 k4k8s_deploy_hybrid_mode_cert_cert_key: "cert"
 k4k8s_deploy_hybrid_mode_cert_key_key: "key"
-k4k8s_deploy_hybrid_mode_cert_expiration: 1095 # 3 years
+k4k8s_deploy_hybrid_mode_cert_expiration: 1095  # 3 years
 k4k8s_deploy_hybrid_mode_cert_common_name: "kong_clustering"
-k4k8s_deploy_create_hybrid_mode_dp_cert_secret: False
+k4k8s_deploy_create_hybrid_mode_dp_cert_secret: false
 # k4k8s_deploy_hybrid_mode_cert_harvest_cluster_context: ""
 # k4k8s_deploy_hybrid_mode_cert_harvest_kubeconfig: ""
-k4k8s_deploy_create_postgres_password_secret: False
+k4k8s_deploy_create_postgres_password_secret: false
 k4k8s_deploy_postgres_password_secret_name: "kong-postgresql"
 k4k8s_deploy_postgres_admin_password_secret_key: "postgres-password"
 k4k8s_deploy_postgres_user_password_secret_key: "password"
 k4k8s_deploy_postgres_admin_password: "kong"
 k4k8s_deploy_postgres_user_password: "kong"
-k4k8s_deploy_create_admin_gui_sessions_conf_secret: False
+k4k8s_deploy_create_admin_gui_sessions_conf_secret: false
 k4k8s_deploy_sessions_conf_secret_name: "kong-session-config"
 k4k8s_deploy_admin_gui_sessions_conf_key: "admin_gui_session_conf"
 k4k8s_deploy_admin_gui_sessions_settings:
-  #cookie_domain: ""
-  #cookie_lifetime: 3600
+  # cookie_domain: ""
+  # cookie_lifetime: 3600
   cookie_name: "please-change-me"
-  #cookie_renew: 600
-  #cookie_samesite: "Strict"
-  #cookie_secure: false
+  # cookie_renew: 600
+  # cookie_samesite: "Strict"
+  # cookie_secure: false
   secret: "please-change-me"
-  #storage: "cookie"
-k4k8s_deploy_create_portal_sessions_conf_secret: False
+  # storage: "cookie"
+k4k8s_deploy_create_portal_sessions_conf_secret: false
 k4k8s_deploy_portal_sessions_conf_key: "portal_session_conf"
 k4k8s_deploy_portal_sessions_settings:
   # cookie_domain: ""
@@ -69,5 +69,5 @@ k4k8s_deploy_portal_sessions_settings:
 
 # k4k8s-deploy Kubernetes & Red Hat OpenShift config
 k4k8s_deploy_namespace: "kong"
-# k4k8s_deploy_kubeconfig: "~/.kube/config" # set when your kubeconfig is in non-standard location or working with multiple clusters
-# k4k8s_deploy_cluster_context: "" # set when you have more than one context in your kubeconfig to ensure correct kubernetes cluster context or working with multiple clusters
+# k4k8s_deploy_kubeconfig: "~/.kube/config"
+# k4k8s_deploy_cluster_context: ""  # set when you have more than one context in your kubeconfig

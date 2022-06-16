@@ -12,11 +12,12 @@
         __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(lookup('file', item) | from_yaml) }}"
       with_items: "{{ k4k8s_deploy_helm_chart_values_files }}"
       when: "k4k8s_deploy_helm_chart_values_files | default([]) | length > 0"
-    
+
     # treat role variable provided values as overrides (recursive=True)
     - name: "Ensure 'k4k8s_deploy_helm_chart_values' values are available"
       ansible.builtin.set_fact:
-        __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(k4k8s_deploy_helm_chart_values | default({}), recursive=True) }}"
+        __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(k4k8s_deploy_helm_chart_values | default({}),
+                                                  recursive=True) }}"
 
 - name: "Helm chart values are on inventory host"
   when: "k4k8s_deploy_helm_chart_values_remote | bool"
@@ -31,8 +32,9 @@
       loop_control:
         loop_var: "__k4k8s_deploy_remote_helm_value_file__"
       when: "k4k8s_deploy_helm_chart_values_files | default([]) | length > 0"
-    
+
     # treat role variable provided values as overrides (recursive=True)
     - name: "Ensure 'k4k8s_deploy_helm_chart_values' values are available"
       ansible.builtin.set_fact:
-        __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(k4k8s_deploy_helm_chart_values | default({}), recursive=True) }}"
+        __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(k4k8s_deploy_helm_chart_values | default({}),
+                                                  recursive=True) }}"

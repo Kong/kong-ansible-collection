@@ -1,5 +1,6 @@
 ---
-- debug:
+- name: "Dump ansible_facts"
+  ansible.builtin.debug:
     var: "ansible_facts"
 
 - name: "Test setup | Prepare CentOS 8 appstream repos"
@@ -25,14 +26,14 @@
         - "CentOS-Linux-Plus"
         - "CentOS-Linux-PowerTools"
         - "CentOS-Linux-Sources"
-      become: True
+      become: true
 
 - name: "Test setup | Ensure collections are available"
-  command: "ansible-galaxy collection install community.general"
+  ansible.builtin.command: "ansible-galaxy collection install community.general"
   delegate_to: "localhost"
 
 - name: "Test setup | Ensure kubeconfig is on remote target"
-  become: True
+  become: true
   block:
     - name: "Test setup | Edit kubeconfig for test container to access kubernetes running on host"
       ansible.builtin.replace:
@@ -68,22 +69,23 @@
         state: "directory"
         prefix: "k4k8s_deploy_setup"
       register: "__k4k8s_deploy_setup_dir__"
-    
+
     - name: "Test setup (remote) | Copy files to remote"
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ __k4k8s_deploy_setup_dir__['path'] }}/{{ item | basename }}"
+        mode: "0755"
       with_items:
         - "{{ k4k8s_deploy_helm_chart_values_files }}"
         - "{{ k4k8s_deploy_yaml_manifest_paths }}"
-    
+
 - name: "Test setup | include {{ values_location }} variables"
   ansible.builtin.include_vars: "{{ values_location }}.yml"
 
 - name: "Test | k4k8s-deploy role"
-  include_role:
+  ansible.builtin.include_role:
     name: "k4k8s_deploy"
-    public: True # so we can validate using the same role variables later
+    public: true # so we can validate using the same role variables later
 
 - name: "Validate deployment"
   ansible.builtin.include_tasks: "validate_deployment.yml"

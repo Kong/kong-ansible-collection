@@ -7,7 +7,7 @@
           - "{{ k4k8s_deploy_pip_executable_path }}"
       when: "k4k8s_deploy_python_package_manager == 'pip'"
       register: "__k4k8s_deploy_pip_pkgs__"
-    
+
     - name: "Set collected python module data"
       ansible.builtin.set_fact:
         __k4k8s_deploy_python_pkgs__: "{{ __k4k8s_deploy_pip_pkgs__.packages[k4k8s_deploy_pip_executable_path] | list }}"
@@ -19,7 +19,7 @@
           - "{{ k4k8s_deploy_pipx_executable_path }}"
       when: "k4k8s_deploy_python_package_manager == 'pipx'"
       register: "__k4k8s_deploy_pipx_pkgs__"
-    
+
     - name: "Set collected python module data"
       ansible.builtin.set_fact:
         __k4k8s_deploy_python_pkgs__: "{{ __k4k8s_deploy_pipx_pkgs__.packages[k4k8s_deploy_pipx_executable_path]  | list }}"
@@ -28,18 +28,18 @@
     - name: "Set initial python module validation status"
       ansible.builtin.set_fact:
         __k4k8s_deploy_python_chk__: []
-    
+
     - name: "Validate python module dependencies are installed"
       ansible.builtin.include_tasks: "validate/chk_py_prereqs.yml"
       with_items: "{{ k4k8s_deploy_python_module_deps }}"
       loop_control:
         loop_var: "__k4k8s_deploy_python_module__"
-    
+
     - name: "Fail due to missing requisite python modules"
       ansible.builtin.fail:
         msg: "The following required python modules are not found on the ansible control node: {{ __k4k8s_deploy_python_chk__ }}"
       when: "__k4k8s_deploy_python_chk__ | length > 0"
-    
+
     - name: "Python module validation complete"
       ansible.builtin.debug:
         msg: "All requisite python modules are available"

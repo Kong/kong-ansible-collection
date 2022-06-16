@@ -1,6 +1,6 @@
 ---
 - name: "Ensure python dependencies are installed"
-  include_role: 
+  ansible.builtin.include_role:
     name: "k4k8s_deploy"
     tasks_from: "prerequisite_install/py_prereqs"
   vars:
@@ -12,12 +12,12 @@
 - name: "Ensure OpenShift environment is in ready state"
   module_defaults:
     kubernetes.core.k8s_info:
-      wait: True
+      wait: true
       wait_timeout: 600
       kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
       context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
     kubernetes.core.k8s:
-      wait: True
+      wait: true
       wait_timeout: 600
       kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
       context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
@@ -27,19 +27,19 @@
         kind: "DaemonSet"
         name: "kube-flannel-ds"
         namespace: "kube-system"
-    
+
     - name: "Ensure 'kubevirt-hostpath-provisioner' DaemonSet status is 'Ready'"
       kubernetes.core.k8s_info:
         kind: "DaemonSet"
         name: "kubevirt-hostpath-provisioner"
         namespace: "kubevirt-hostpath-provisioner"
-    
+
     - name: "Ensure 'dns-default' DaemonSet status is 'Ready'"
       kubernetes.core.k8s_info:
         kind: "DaemonSet"
         name: "dns-default"
         namespace: "openshift-dns"
-    
+
     - name: "Ensure 'node-resolver' DaemonSet status is 'Ready'"
       kubernetes.core.k8s_info:
         kind: "DaemonSet"
@@ -57,6 +57,7 @@
         kind: "Deployment"
         name: "service-ca"
         namespace: "openshift-service-ca"
-    
-    - debug:
+
+    - name: "OpenShift looks good to me"
+      ansible.builtin.debug:
         msg: "OpenShift LGTM"

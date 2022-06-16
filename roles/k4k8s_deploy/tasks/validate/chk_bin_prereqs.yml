@@ -2,8 +2,8 @@
 # check for binary dependencies
 - name: "Validate binary is installed | {{ __k4k8s_deploy_bin__ }}"
   ansible.builtin.command: "which {{ __k4k8s_deploy_bin__ }}"
-  ignore_errors: True
-  changed_when: False
+  ignore_errors: true
+  changed_when: false
   register: "__k4k8s_deploy_binary_install_status__"
 
 - name: "Append to failed binary validation list"

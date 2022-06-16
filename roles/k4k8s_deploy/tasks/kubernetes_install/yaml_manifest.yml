@@ -7,13 +7,14 @@
         state: "directory"
         prefix: "k4k8s_deploy_manifests"
       register: "__k4k8s_deploy_manifest_dir__"
-    
+
     - name: "Ensure yaml manifests are present on {{ inventory_hostname }}"
       ansible.builtin.copy:
-        src: "{{ item }}"
         dest: "{{ __k4k8s_deploy_manifest_dir__.path }}/{{ item | basename }}"
+        mode: "0755"
+        src: "{{ item }}"
       with_items: "{{ k4k8s_deploy_yaml_manifest_paths }}"
-  
+
     - name: "Ensure yaml manifests are applied"
       ansible.builtin.include_tasks: "common/yaml_manifest_apply.yml"
       with_items: "{{ k4k8s_deploy_yaml_manifest_paths }}"

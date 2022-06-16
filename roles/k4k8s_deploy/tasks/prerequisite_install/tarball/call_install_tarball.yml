@@ -6,7 +6,7 @@
         state: "directory"
         prefix: "k4k8s_deploy"
       register: "__k4k8s_deploy_download_dir__"
-    
+
     - name: "Ensure binary tarball prerequisites are present"
       ansible.builtin.include_tasks: "prerequisite_install/tarball/install_tarball.yml"
       with_items:
@@ -15,7 +15,7 @@
         loop_var: "__k4k8s_deploy_tarball__"
 
   always:
-  - name: "Ensure temporary directory for tarball downloads is absent"
-    ansible.builtin.file:
-      path: "{{ __k4k8s_deploy_download_dir__.path }}"
-      state: "absent"
+    - name: "Ensure temporary directory for tarball downloads is absent"
+      ansible.builtin.file:
+        path: "{{ __k4k8s_deploy_download_dir__.path }}"
+        state: "absent"

@@ -2,12 +2,12 @@
 - name: "Deploy kong for kubernetes prerequisite components"
   module_defaults:
     kubernetes.core.k8s_info:
-      wait: True
+      wait: true
       wait_timeout: 600
       kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
       context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
     kubernetes.core.k8s:
-      wait: True
+      wait: true
       wait_timeout: 600
       kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
       context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
@@ -18,7 +18,7 @@
         api_version: "v1"
         kind: "Namespace"
         state: "present"
-    
+
     - name: "Ensure kong for kubernetes secrets are present"
       ansible.builtin.include_tasks: "kubernetes_install/secrets/create_secrets.yml"
       when: ("k4k8s_deploy_create_enterprise_license_secret | default(False) | bool") or

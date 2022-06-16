@@ -25,18 +25,18 @@ k4k8s_deploy_yaml_manifest_paths:
 k4k8s_deploy_method: "{{ deploy_method }}" # passed from GH actions matrix
 
 # Test all install mechanisms
-k4k8s_deploy_install_binary_dependencies: True
-k4k8s_deploy_install_python_dependencies: True
-k4k8s_deploy_install_ansible_collection_dependencies: True
+k4k8s_deploy_install_binary_dependencies: true
+k4k8s_deploy_install_python_dependencies: true
+k4k8s_deploy_install_ansible_collection_dependencies: true
 
 # Test all secret creation mechanisms
-k4k8s_deploy_create_enterprise_superuser_password_secret: True
-k4k8s_deploy_create_enterprise_license_secret: True
-k4k8s_deploy_create_hybrid_mode_cp_cert_secret: True
-k4k8s_deploy_create_hybrid_mode_dp_cert_secret: True
-k4k8s_deploy_create_admin_gui_sessions_conf_secret: True
-k4k8s_deploy_create_portal_sessions_conf_secret: True
-k4k8s_deploy_create_postgres_password_secret: True
+k4k8s_deploy_create_enterprise_superuser_password_secret: true
+k4k8s_deploy_create_enterprise_license_secret: true
+k4k8s_deploy_create_hybrid_mode_cp_cert_secret: true
+k4k8s_deploy_create_hybrid_mode_dp_cert_secret: true
+k4k8s_deploy_create_admin_gui_sessions_conf_secret: true
+k4k8s_deploy_create_portal_sessions_conf_secret: true
+k4k8s_deploy_create_postgres_password_secret: true
 k4k8s_deploy_admin_gui_sessions_settings:
   cookie_lifetime: 3600
   cookie_name: "please-change-me"

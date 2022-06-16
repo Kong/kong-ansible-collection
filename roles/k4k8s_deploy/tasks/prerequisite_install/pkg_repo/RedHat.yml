@@ -14,4 +14,4 @@
   with_items: "{{ k4k8s_deploy_install_pkg_repos }}"
   loop_control:
     loop_var: "repo"
-  become: True
+  become: true

@@ -22,7 +22,7 @@
 - name: "Validate deployment"
   module_defaults:
     kubernetes.core.k8s_info:
-      wait: True
+      wait: true
       wait_timeout: 600
       kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
       context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
@@ -33,34 +33,35 @@
         kind: "Namespace"
         name: "{{ k4k8s_deploy_namespace }}"
       register: "__k4k8s_deploy_namespace_results__"
-    
+
     - name: "Collect kong enterprise license secret"
       kubernetes.core.k8s_info:
         kind: "Secret"
         name: "{{ k4k8s_deploy_enterprise_license_secret_name }}"
       register: "__k4k8s_deploy_enterprise_license_secret_results__"
-    
+
     - name: "Collect kong enterprise superuser password secret"
       kubernetes.core.k8s_info:
         kind: "Secret"
         name: "{{ k4k8s_deploy_enterprise_superuser_password_secret_name }}"
       register: "__k4k8s_deploy_enterprise_superuser_password_secret_results__"
-    
+
     - name: "Collect kong sessions configuration secret"
       kubernetes.core.k8s_info:
         kind: "Secret"
         name: "{{ k4k8s_deploy_sessions_conf_secret_name }}"
       register: "__k4k8s_deploy_session_conf_secret_results__"
-    
-    - ansible.builtin.debug:
+
+    - name: "Output kong sessions configuration secret results"
+      ansible.builtin.debug:
         var: "__k4k8s_deploy_session_conf_secret_results__"
-    
+
     - name: "Collect postres admin password secret"
       kubernetes.core.k8s_info:
         kind: "Secret"
         name: "{{ k4k8s_deploy_postgres_password_secret_name }}"
       register: "__k4k8s_deploy_postgres_password_secret_results__"
-    
+
     - name: "Collect hybrid-mode certificate secret"
       kubernetes.core.k8s_info:
         kind: "Secret"
@@ -72,37 +73,37 @@
         kind: "Service"
         name: "kong-postgresql"
       register: "__k4k8s_deploy_kong_postgresql_svc_results__"
-    
+
     - name: "Collect kong-admin service"
       kubernetes.core.k8s_info:
         kind: "Service"
         name: "kong-kong-admin"
       register: "__k4k8s_deploy_kong_admin_svc_results__"
-    
+
     - name: "Collect kong-manager service"
       kubernetes.core.k8s_info:
         kind: "Service"
         name: "kong-kong-manager"
       register: "__k4k8s_deploy_kong_manager_svc_results__"
-    
+
     - name: "Collect kong-portalapi service"
       kubernetes.core.k8s_info:
         kind: "Service"
         name: "kong-kong-portalapi"
       register: "__k4k8s_deploy_kong_portalapi_svc_results__"
-    
+
     - name: "Collect kong-portal service"
       kubernetes.core.k8s_info:
         kind: "Service"
         name: "kong-kong-portal"
       register: "__k4k8s_deploy_kong_portal_svc_results__"
-    
+
     - name: "Collect kong-proxy service"
       kubernetes.core.k8s_info:
         kind: "Service"
         name: "kong-kong-proxy"
       register: "__k4k8s_deploy_kong_proxy_svc_results__"
-    
+
     - name: "Collect kong deployment"
       kubernetes.core.k8s_info:
         kind: "Deployment"
@@ -111,7 +112,7 @@
 
     - name: "Collect kong-postgresql statefulset"
       kubernetes.core.k8s_info:
-        wait: False
+        wait: false
         kind: "StatefulSet"
         name: "kong-postgresql"
       register: "__k4k8s_deploy_kong_postgresql_statefulset_results__"
@@ -125,29 +126,29 @@
 - name: "Full validation"
   ansible.builtin.assert:
     that:
-      - "__k4k8s_deploy_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_deploy_namespace" # namespace name matches
-      - "__k4k8s_deploy_enterprise_license_secret_results__['resources'][0]['data'][k4k8s_deploy_enterprise_license_secret_key] | b64decode == k4k8s_deploy_enterprise_license_json_string" # key and licence match
-      - "__k4k8s_deploy_enterprise_superuser_password_secret_results__['resources'][0]['data']['password'] | b64decode == k4k8s_deploy_enterprise_superuser_password" # superuser passwords match
-      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_admin_gui_sessions_conf_key] | b64decode == __k4k8s_deploy_admin_gui_session_conf_string__" # admin gui session config matches from secret to constructed conf
-      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode == __k4k8s_deploy_portal_session_conf_string__" # portal session config matches from secret to constructed conf
-      - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_admin_password_secret_key] | b64decode == k4k8s_deploy_postgres_admin_password" # postgres admin passwords match
-      - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_user_password_secret_key] | b64decode == k4k8s_deploy_postgres_user_password" # postgres user passwords match
-      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_cert_key] | b64decode == __k4k8s_deploy_x509_cert__['certificate'] | string" # hybrid-mode x509 cert data and generated x509 cert match
-      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_key_key] | b64decode == __k4k8s_deploy_openssl_key__['privatekey'] | string" # hybrid-mode openssl private key data and generated openssl private key match
-      - "__k4k8s_deploy_kong_postgresql_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 5432" # kong-postgresql port is 5432
-      - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8001" # kong-admin http port is 8001
-      - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8444" # kong-admin https port is 8444
-      - "__k4k8s_deploy_kong_manager_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8002" # kong-manager http port is 8002
-      - "__k4k8s_deploy_kong_manager_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8445" # kong-manager https port is 8445
-      - "__k4k8s_deploy_kong_portalapi_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8004" # kong-portalapi http port is 8004
-      - "__k4k8s_deploy_kong_portalapi_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8447" # kong-portalapi https port is 8447
-      - "__k4k8s_deploy_kong_portal_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8003" # kong-portal http port is 8003
-      - "__k4k8s_deploy_kong_portal_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8446" # kong-portal https port is 8446
-      - "__k4k8s_deploy_kong_proxy_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 80" # kong-proxy http port is 80
-      - "__k4k8s_deploy_kong_proxy_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 443" # kong-proxy https port is 443
-      - "__k4k8s_deploy_kong_deployment_results__['resources'][0]['metadata']['name'] == 'kong-kong'" # kong-kong Deployment was deployed
-      - "__k4k8s_deploy_kong_deployment_results__['resources'][0]['status']['availableReplicas'] | int == 1" # kong-kong Deployment has 1 replica available
+      - "__k4k8s_deploy_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_deploy_namespace"  # namespace name matches
+      - "__k4k8s_deploy_enterprise_license_secret_results__['resources'][0]['data'][k4k8s_deploy_enterprise_license_secret_key] | b64decode == k4k8s_deploy_enterprise_license_json_string"  # key and licence match
+      - "__k4k8s_deploy_enterprise_superuser_password_secret_results__['resources'][0]['data']['password'] | b64decode == k4k8s_deploy_enterprise_superuser_password"  # superuser passwords match
+      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_admin_gui_sessions_conf_key] | b64decode == __k4k8s_deploy_admin_gui_session_conf_string__"  # admin gui session config matches from secret to constructed conf
+      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode == __k4k8s_deploy_portal_session_conf_string__"  # portal session config matches from secret to constructed conf
+      - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_admin_password_secret_key] | b64decode == k4k8s_deploy_postgres_admin_password"  # postgres admin passwords match
+      - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_user_password_secret_key] | b64decode == k4k8s_deploy_postgres_user_password"  # postgres user passwords match
+      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_cert_key] | b64decode == __k4k8s_deploy_x509_cert__['certificate'] | string"  # hybrid-mode x509 cert data and generated x509 cert match
+      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_key_key] | b64decode == __k4k8s_deploy_openssl_key__['privatekey'] | string"  # hybrid-mode openssl private key data and generated openssl private key match
+      - "__k4k8s_deploy_kong_postgresql_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 5432"  # kong-postgresql port is 5432
+      - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8001"  # kong-admin http port is 8001
+      - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8444"  # kong-admin https port is 8444
+      - "__k4k8s_deploy_kong_manager_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8002"  # kong-manager http port is 8002
+      - "__k4k8s_deploy_kong_manager_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8445"  # kong-manager https port is 8445
+      - "__k4k8s_deploy_kong_portalapi_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8004"  # kong-portalapi http port is 8004
+      - "__k4k8s_deploy_kong_portalapi_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8447"  # kong-portalapi https port is 8447
+      - "__k4k8s_deploy_kong_portal_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8003"  # kong-portal http port is 8003
+      - "__k4k8s_deploy_kong_portal_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8446"  # kong-portal https port is 8446
+      - "__k4k8s_deploy_kong_proxy_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 80"  # kong-proxy http port is 80
+      - "__k4k8s_deploy_kong_proxy_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 443"  # kong-proxy https port is 443
+      - "__k4k8s_deploy_kong_deployment_results__['resources'][0]['metadata']['name'] == 'kong-kong'"  # kong-kong Deployment was deployed
+      - "__k4k8s_deploy_kong_deployment_results__['resources'][0]['status']['availableReplicas'] | int == 1"  # kong-kong Deployment has 1 replica available
       - "__k4k8s_deploy_kong_deployment_results__['resources'][0]['status']['conditions'][0]['type'] == 'Available' and __k4k8s_deploy_kong_deployment_results__['resources'][0]['status']['conditions'][0]['reason'] == 'MinimumReplicasAvailable'" # kong-kong Deployment condition is available
-      - "__k4k8s_deploy_kong_postgresql_statefulset_results__['resources'][0]['metadata']['name'] == 'kong-postgresql'" # kong-postgresql StatefulSet was deployed
-      - "__k4k8s_deploy_kong_postgresql_pod_results__['resources'][0]['metadata']['name'] == 'kong-postgresql-0'" # kong-postgresql-0 Pod was deployed
-      - "__k4k8s_deploy_kong_postgresql_pod_results__['resources'][0]['status']['containerStatuses'][0]['ready'] | bool" # kong-postgresql-0 Pod is running and ready
+      - "__k4k8s_deploy_kong_postgresql_statefulset_results__['resources'][0]['metadata']['name'] == 'kong-postgresql'"  # kong-postgresql StatefulSet was deployed
+      - "__k4k8s_deploy_kong_postgresql_pod_results__['resources'][0]['metadata']['name'] == 'kong-postgresql-0'"  # kong-postgresql-0 Pod was deployed
+      - "__k4k8s_deploy_kong_postgresql_pod_results__['resources'][0]['status']['containerStatuses'][0]['ready'] | bool"  # kong-postgresql-0 Pod is running and ready

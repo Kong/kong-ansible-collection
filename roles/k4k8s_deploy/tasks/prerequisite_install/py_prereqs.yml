@@ -15,8 +15,8 @@
       community.general.pipx:
         executable: "{{ k4k8s_deploy_pipx_executable_path }}"
         inject_packages: "{{ k4k8s_deploy_python_module_deps }}"
-        install_deps: True
+        install_deps: true
         name: "{{ k4k8s_deploy_pipx_package }}"
         state: "inject"
       when: "k4k8s_deploy_python_package_manager == 'pipx'"
-      become: True
+      become: true
