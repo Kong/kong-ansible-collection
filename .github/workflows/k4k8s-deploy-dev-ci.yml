@@ -1,9 +1,9 @@
 ---
-name: k4k8s_deploy
+name: k4k8s_deploy dev branch
 "on":
   push:
     branches:
-      - "main"
+      - "dev"
     paths:
       - ".github/workflows/k4k8s-deploy-ci.yml"
       - "roles/k4k8s_deploy/**"
