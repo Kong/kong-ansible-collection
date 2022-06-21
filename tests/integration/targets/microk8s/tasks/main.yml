@@ -1,13 +1,6 @@
 ---
 - name: "Ensure python dependencies are installed"
-  ansible.builtin.include_role:
-    name: "k4k8s_deploy"
-    tasks_from: "prerequisite_install/py_prereqs"
-  vars:
-    k4k8s_deploy_python_module_deps:
-      - "kubernetes"
-    k4k8s_deploy_python_package_manager: "pipx"
-    k4k8s_deploy_pipx_package: "ansible-core"
+  ansible.builtin.include_tasks: "prerequisite_install/py_prereqs.yml"
 
 - name: "Ensure Kubernetes environment is in ready state"
   module_defaults:

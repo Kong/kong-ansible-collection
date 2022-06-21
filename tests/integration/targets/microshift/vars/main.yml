@@ -1,0 +1,5 @@
+k4k8s_deploy_python_module_deps:
+  - "kubernetes"
+k4k8s_deploy_python_package_manager: "pipx"
+k4k8s_deploy_pipx_package: "ansible-core"
+k4k8s_deploy_pipx_executable_path: "pipx"
