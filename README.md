@@ -18,7 +18,7 @@ Click on the name of a collection component within the table below for the full 
 
 |Role name|Description|
 |---|---|
-|[kong.kong.k4k8s_deploy](roles/k4k8s_deploy/)|An Ansible role to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, and Kong Kubernetes Ingress Controller to Kubernetes or Red Hat OpenShift clusters using Helm or YAML manifests.|
+|[kong.kong.k4k8s_deploy](https://github.com/Kong/kong-ansible-collection/tree/main/roles/k4k8s_deploy)|An Ansible role to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, and Kong Kubernetes Ingress Controller to Kubernetes or Red Hat OpenShift clusters using Helm or YAML manifests.|
 
 
 ## License

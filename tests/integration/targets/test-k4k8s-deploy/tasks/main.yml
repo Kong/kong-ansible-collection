@@ -32,6 +32,51 @@
   ansible.builtin.command: "ansible-galaxy collection install community.general"
   delegate_to: "localhost"
 
+- name: "Test setup | include common test variables"
+  ansible.builtin.include_vars: "common.yml"
+
+- name: "Test setup | Install python dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/py_prereqs.yml"
+  when: "k4k8s_deploy_install_python_dependencies | bool"
+
+# - name: "Validate python dependencies"
+#   ansible.builtin.include_tasks: "validate/call_chk_py_prereqs.yml"
+#   when: "k4k8s_deploy_validate_python_dependencies | bool"
+
+- name: "Test setup | Ensure hybrid mode certificate ansible collection dependencies are included"
+  ansible.builtin.set_fact:
+    k4k8s_deploy_ansible_collection_deps: "{{ k4k8s_deploy_ansible_collection_deps | union(k4k8s_deploy_ansible_collection_deps_hybrid_certs) }}"
+  when: (k4k8s_deploy_install_ansible_collection_dependencies | bool and k4k8s_deploy_create_hybrid_mode_cp_cert_secret | bool) or
+        (k4k8s_deploy_validate_ansible_collection_dependencies | bool and k4k8s_deploy_create_hybrid_mode_cp_cert_secret | bool)
+
+- name: "Test setup | Install ansible collection dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/ansible_collection_prereqs.yml"
+  when: "k4k8s_deploy_install_ansible_collection_dependencies | bool"
+  tags:
+    - "install_deps"
+    - "install_collection_deps"
+
+# - name: "Test setup | Validate ansible collection dependencies"
+#   ansible.builtin.include_tasks: "validate/call_chk_ansible_collection_prereqs.yml"
+#   when: "k4k8s_deploy_validate_ansible_collection_dependencies | bool"
+#   tags:
+#     - "validate_deps"
+#     - "validate_collection_deps"
+
+- name: "Ensure helm dependencies are included"
+  ansible.builtin.set_fact:
+    k4k8s_deploy_bin_deps: "{{ k4k8s_deploy_bin_deps | union(k4k8s_deploy_bin_deps_helm_method) }}"
+    k4k8s_deploy_install_bin_tarballs: "{{ k4k8s_deploy_install_bin_tarballs | union(k4k8s_deploy_install_bin_tarballs_helm_method) }}"
+  when: "k4k8s_deploy_method == 'helm'"
+
+- name: "Install binary dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/bin_prereqs.yml"
+  when: "k4k8s_deploy_install_binary_dependencies | bool"
+
+# - name: "Test setup | Validate binary dependencies"
+#   ansible.builtin.include_tasks: "validate/call_chk_bin_prereqs.yml"
+#   when: "k4k8s_deploy_validate_binary_dependencies | bool"
+
 - name: "Test setup | Ensure kubeconfig is on remote target"
   become: true
   block:
@@ -57,9 +102,6 @@
         mode: "0600"
         owner: "root"
         group: "root"
-
-- name: "Test setup | include common test variables"
-  ansible.builtin.include_vars: "common.yml"
 
 - name: "Test setup (remote) | Copy files to remote"
   when: "values_location == 'remote_values'"
