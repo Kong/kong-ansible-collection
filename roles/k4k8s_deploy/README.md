@@ -71,7 +71,9 @@ ansible-galaxy install -r galaxy-requirements.yml
 
 ### Binary dependencies
 
-When using `k4k8s_deploy_method: "helm"` (default value) [Helm3](https://helm.sh/docs/intro/install/) is required on the target Ansible host.
+1. When using `k4k8s_deploy_method: "helm"` (default value) [Helm3](https://helm.sh/docs/intro/install/) `helm` is required on the target Ansible host (`{{ inventory_hostname }}`) in `$PATH`.
+1. When using `k4k8s_deploy_create_hybrid_mode_cp_cert_secret: true` to generate control-plane hybrid-mode shared private-key/certificate pair secrets, [OpenSSL](https://wiki.openssl.org/index.php/Binaries) `openssl` or `openssl3` (on CentOS8/RedHat8) is required on the target Ansible host (`{{ inventory_hostname }}`) in `$PATH`.
+
 
 **[Table of Contents](#table-of-contents)**
 
@@ -215,7 +217,7 @@ The following variables apply only when `k4k8s_deploy_method: "helm"` is set (de
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
 |`k4k8s_deploy_helm_atomic`|Equivalent to the `helm` `--atomic` option.|boolean|`False`|no|
-|`k4k8s_deploy_helm_binary_path`|Path to the `helm` executable.|string|`"{{ k4k8s_deploy_bin_version_info['helm']['destination'] }}/helm"`|no|
+|`k4k8s_deploy_helm_binary_path`|Path to the `helm` executable.|string|`"helm"`|no|
 |`k4k8s_deploy_helm_chart_ref`|The Helm chart name to use to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, and Kong Kubernetes Ingress Controller to Kubernetes or Red Hat OpenShift clusters.|string|`"kong/kong"`|no|
 |`k4k8s_deploy_helm_chart_repo_name`|Name to install the Helm chart repository as.|string|`"kong"`|no|
 |`k4k8s_deploy_helm_chart_repo_url`|URL for Kong's helm chart repository.|string|`"https://charts.konghq.com"`|no|

@@ -1,5 +1,6 @@
 ---
-k4k8s_deploy_install_bin_pkgs: []
+k4k8s_deploy_bin_pkgs:
+  - "openssl"
 
 k4k8s_deploy_install_pkg_repos: []
   # - name: "kubernetes"

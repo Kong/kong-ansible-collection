@@ -1,7 +1,7 @@
 ---
 # Helm3
 k4k8s_deploy_helm_atomic: false
-k4k8s_deploy_helm_binary_path: "{{ k4k8s_deploy_bin_version_info['helm']['destination'] }}/helm"
+k4k8s_deploy_helm_binary_path: "helm"
 k4k8s_deploy_helm_chart_ref: "kong/kong"
 k4k8s_deploy_helm_chart_repo_name: "kong"
 k4k8s_deploy_helm_chart_repo_url: "https://charts.konghq.com"
