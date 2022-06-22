@@ -133,8 +133,8 @@
       - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode == __k4k8s_deploy_portal_session_conf_string__"  # portal session config matches from secret to constructed conf
       - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_admin_password_secret_key] | b64decode == k4k8s_deploy_postgres_admin_password"  # postgres admin passwords match
       - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_user_password_secret_key] | b64decode == k4k8s_deploy_postgres_user_password"  # postgres user passwords match
-      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_cert_key] | b64decode == __k4k8s_deploy_x509_cert__['certificate'] | string"  # hybrid-mode x509 cert data and generated x509 cert match
-      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_key_key] | b64decode == __k4k8s_deploy_openssl_key__['privatekey'] | string"  # hybrid-mode openssl private key data and generated openssl private key match
+      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_cert_key] | b64decode | string == __k4k8s_deploy_hybrid_cert__['content'] | b64decode | string"  # hybrid-mode x509 cert data and generated x509 cert match
+      - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_key_key] | b64decode | string == __k4k8s_deploy_hybrid_private_key__['content'] | b64decode | string"  # hybrid-mode openssl private key data and generated openssl private key match
       - "__k4k8s_deploy_kong_postgresql_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 5432"  # kong-postgresql port is 5432
       - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][0]['port'] == 8001"  # kong-admin http port is 8001
       - "__k4k8s_deploy_kong_admin_svc_results__['resources'][0]['spec']['ports'][1]['port'] == 8444"  # kong-admin https port is 8444

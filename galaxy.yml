@@ -8,7 +8,7 @@ namespace: "kong"
 name: "kong"
 
 # The version of the collection. Must be compatible with semantic versioning
-version: "0.1.1"
+version: "0.1.2"
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: "README.md"
@@ -57,8 +57,6 @@ tags:
 # range specifiers can be set and are separated by ','
 dependencies:
   "kubernetes.core": "*"
-  "community.general": "*"
-  "community.crypto": "*"
 
 # The URL of the originating SCM repository
 repository: "https://github.com/Kong/kong-ansible-collection"

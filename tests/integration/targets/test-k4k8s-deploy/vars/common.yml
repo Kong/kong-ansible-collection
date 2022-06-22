@@ -85,14 +85,15 @@ k4k8s_deploy_ansible_collection_deps:
   - "community.general"
   - "kubernetes.core"
 
-k4k8s_deploy_ansible_collection_deps_hybrid_certs:
-  - "community.crypto"
+k4k8s_deploy_ansible_collection_deps_hybrid_certs: []
+  # - "community.crypto"
 
 # k4k8s_deploy_ansible_collection_path: ""
 k4k8s_deploy_ansible_galaxy_executable_path: "ansible-galaxy"
 
 # Binaries
-k4k8s_deploy_bin_deps: []
+k4k8s_deploy_bin_deps:
+  - "openssl"
 
 k4k8s_deploy_bin_deps_helm_method:
   - "helm"
