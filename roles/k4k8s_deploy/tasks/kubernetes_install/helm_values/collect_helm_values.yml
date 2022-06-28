@@ -22,11 +22,11 @@
 - name: "Helm chart values are on inventory host"
   when: "k4k8s_deploy_helm_chart_values_remote | bool"
   block:
-    - name: "Set initial empty helm chart values"
+    - name: "Set initial empty helm chart values | remote values"
       ansible.builtin.set_fact:
         __k4k8s_deploy_helm_release_values__: {}
 
-    - name: "Ensure 'k4k8s_deploy_helm_chart_values_files' values are available"
+    - name: "Ensure 'k4k8s_deploy_helm_chart_values_files' values are available | remote values"
       ansible.builtin.include_tasks: "kubernetes_install/helm_values/remote_helm_values.yml"
       with_items: "{{ k4k8s_deploy_helm_chart_values_files }}"
       loop_control:
@@ -34,7 +34,7 @@
       when: "k4k8s_deploy_helm_chart_values_files | default([]) | length > 0"
 
     # treat role variable provided values as overrides (recursive=True)
-    - name: "Ensure 'k4k8s_deploy_helm_chart_values' values are available"
+    - name: "Ensure 'k4k8s_deploy_helm_chart_values' values are available | remote values"
       ansible.builtin.set_fact:
         __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(k4k8s_deploy_helm_chart_values | default({}),
                                                   recursive=True) }}"
