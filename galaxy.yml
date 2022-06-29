@@ -35,6 +35,11 @@ license:
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
 tags:
+  - "cloud"
+  - "security"
+  - "infrastructure"
+  - "networking"
+  - "linux"
   - "api"
   - "gateway"
   - "mesh"
