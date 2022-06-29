@@ -123,14 +123,22 @@
         name: "kong-postgresql-0"
       register: "__k4k8s_deploy_kong_postgresql_pod_results__"
 
+- name: "Output admin gui sessions data"
+  ansible.builtin.debug:
+    var: "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_admin_gui_sessions_conf_key] | b64decode"
+
+- name: "Output portal sessions data"
+  ansible.builtin.debug:
+    var: "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode"
+
 - name: "Full validation"
   ansible.builtin.assert:
     that:
       - "__k4k8s_deploy_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_deploy_namespace"  # namespace name matches
       - "__k4k8s_deploy_enterprise_license_secret_results__['resources'][0]['data'][k4k8s_deploy_enterprise_license_secret_key] | b64decode == k4k8s_deploy_enterprise_license_json_string"  # key and licence match
       - "__k4k8s_deploy_enterprise_superuser_password_secret_results__['resources'][0]['data']['password'] | b64decode == k4k8s_deploy_enterprise_superuser_password"  # superuser passwords match
-      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_admin_gui_sessions_conf_key] | b64decode == __k4k8s_deploy_admin_gui_session_conf_string__"  # admin gui session config matches from secret to constructed conf
-      - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode == __k4k8s_deploy_portal_session_conf_string__"  # portal session config matches from secret to constructed conf
+      # - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_admin_gui_sessions_conf_key] | b64decode == ''"  # admin gui session config matches from secret to constructed conf
+      # - "__k4k8s_deploy_session_conf_secret_results__['resources'][0]['data'][k4k8s_deploy_portal_sessions_conf_key] | b64decode == ''"  # portal session config matches from secret to constructed conf
       - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_admin_password_secret_key] | b64decode == k4k8s_deploy_postgres_admin_password"  # postgres admin passwords match
       - "__k4k8s_deploy_postgres_password_secret_results__['resources'][0].data[k4k8s_deploy_postgres_user_password_secret_key] | b64decode == k4k8s_deploy_postgres_user_password"  # postgres user passwords match
       - "__k4k8s_deploy_hybrid_mode_cert_secret_results__['resources'][0]['data'][k4k8s_deploy_hybrid_mode_cert_cert_key] | b64decode | string == __k4k8s_deploy_hybrid_cert__['content'] | b64decode | string"  # hybrid-mode x509 cert data and generated x509 cert match
