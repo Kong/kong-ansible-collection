@@ -19,6 +19,7 @@ name: k4k8s_deploy dev branch
     types:
       - ready_for_review
       - review_requested
+
   workflow_dispatch:
 
 env:
@@ -52,7 +53,7 @@ jobs:
     strategy:
       matrix:
         operating_system:
-          - "centos8"
+          # - "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
           - "ubuntu1804"
           - "ubuntu2004"
           - "opensuse15"
@@ -64,12 +65,12 @@ jobs:
           - "local_values"
         exclude:
           # only run the remote_values test on ubuntu1804, 1 is good enough here
-          - operating_system: "centos8"
-            deploy_method: "helm"
-            values_location: "remote_values"
-          - operating_system: "centos8"
-            deploy_method: "yaml_manifest"
-            values_location: "remote_values"
+          # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
+          #   deploy_method: "helm"
+          #   values_location: "remote_values"
+          # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
+          #   deploy_method: "yaml_manifest"
+          #   values_location: "remote_values"
           - operating_system: "ubuntu2004"
             deploy_method: "helm"
             values_location: "remote_values"
@@ -143,7 +144,7 @@ jobs:
     strategy:
       matrix:
         operating_system:
-          - "centos8"
+          # - "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
           - "ubuntu1804"
           - "ubuntu2004"
           - "opensuse15"
@@ -155,12 +156,12 @@ jobs:
           - "local_values"
         exclude:
           # only run the remote_values test on ubuntu1804, 1 is good enough here
-          - operating_system: "centos8"
-            deploy_method: "helm"
-            values_location: "remote_values"
-          - operating_system: "centos8"
-            deploy_method: "yaml_manifest"
-            values_location: "remote_values"
+          # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
+          #   deploy_method: "helm"
+          #   values_location: "remote_values"
+          # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
+          #   deploy_method: "yaml_manifest"
+          #   values_location: "remote_values"
           - operating_system: "ubuntu2004"
             deploy_method: "helm"
             values_location: "remote_values"

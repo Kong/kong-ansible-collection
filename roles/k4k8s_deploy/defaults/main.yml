@@ -37,6 +37,7 @@ k4k8s_deploy_hybrid_mode_cert_common_name: "kong_clustering"
 k4k8s_deploy_create_hybrid_mode_dp_cert_secret: false
 # k4k8s_deploy_hybrid_mode_cert_harvest_cluster_context: ""
 # k4k8s_deploy_hybrid_mode_cert_harvest_kubeconfig: ""
+# k4k8s_deploy_hybrid_mode_cert_harvest_namespace: ""
 k4k8s_deploy_create_postgres_password_secret: false
 k4k8s_deploy_postgres_password_secret_name: "kong-postgresql"
 k4k8s_deploy_postgres_admin_password_secret_key: "postgres-password"
