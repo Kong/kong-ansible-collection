@@ -19,7 +19,7 @@
       loop_control:
         loop_var: "__k4k8s_deploy_galaxy_output_line__"
 
-    - name: "Validate binary dependencies are installed"
+    - name: "Validate ansible collection dependencies are installed"
       ansible.builtin.include_tasks: "validate/chk_ansible_collection_prereqs.yml"
       with_items: "{{ k4k8s_deploy_ansible_collection_deps }}"
       loop_control:
