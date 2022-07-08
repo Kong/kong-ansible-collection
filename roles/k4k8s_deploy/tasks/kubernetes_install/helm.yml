@@ -17,11 +17,11 @@
     binary_path: "{{ k4k8s_deploy_helm_binary_path }}"
     chart_ref: "{{ k4k8s_deploy_helm_chart_ref }}"
     chart_version: "{{ k4k8s_deploy_helm_chart_version | default(omit) }}"
-    context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
     create_namespace: false
     disable_hook: "{{ k4k8s_deploy_helm_disable_hook }}"
     force: "{{ k4k8s_deploy_helm_force_reinstall }}"
-    kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     release_name: "{{ k4k8s_deploy_helm_release_name }}"
     release_namespace: "{{ k4k8s_deploy_namespace }}"
     release_state: "present"
