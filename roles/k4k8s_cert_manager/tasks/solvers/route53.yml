@@ -1,0 +1,18 @@
+---
+- name: "Ensure jetstack cert-manager route53 secret is present"
+  kubernetes.core.k8s:
+    state: "present"
+    definition: "{{ lookup('template', 'templates/secrets/route53_secret.yaml.j2' | from_yaml) }}"
+  when: 
+    - "k4k8s_cm_create_route53_secret | bool"
+    - "k4k8s_cm_route53_access_key_id != ''"
+    - "k4k8s_cm_route53_secret_access_key != ''"
+
+- name: "Ensure jetstack cert-manager cluster issuer configuration is present | aws route53"
+  kubernetes.core.k8s:
+    state: "present"
+    definition: "{{ lookup('template', 'templates/cluster_issuer_route53.yaml.j2' | from_yaml) }}"
+  when: 
+    - "k4k8s_cm_acme_acct_email_address != ''"
+    - "k4k8s_cm_route53_dns_zones | length > 0"
+    - "k4k8s_cm_route53_region != ''"

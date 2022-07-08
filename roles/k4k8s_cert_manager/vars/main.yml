@@ -1,0 +1,33 @@
+# helm
+# k4k8s_cm_helm_binary_path: "helm"
+# k4k8s_cm_helm_chart_repo_username: ""
+# k4k8s_cm_helm_chart_repo_password: ""
+k4k8s_cm_helm_atomic: false
+k4k8s_cm_helm_chart_ref: "jetstack/cert-manager"
+k4k8s_cm_helm_chart_version: "v1.8.2"
+k4k8s_cm_helm_disable_hook: false
+k4k8s_cm_helm_force_reinstall: false
+k4k8s_cm_helm_release_name: "cert-manager"
+k4k8s_cm_helm_replace: false
+k4k8s_cm_helm_update_repo: true
+k4k8s_cm_helm_wait: true
+k4k8s_cm_helm_chart_repo_url: "https://charts.jetstack.io"
+k4k8s_cm_crd_install_url: "https://github.com/cert-manager/cert-manager/releases/download/{{ k4k8s_cm_helm_chart_version }}/cert-manager.crds.yaml"
+k4k8s_cm_helm_chart_repo_name: "jetstack"
+
+# idempotency check on crd installation
+k4k8s_cm_crd_names:
+  - "certificaterequests.cert-manager.io"
+  - "certificates.cert-manager.io"
+  - "challenges.acme.cert-manager.io"
+  - "clusterissuers.cert-manager.io"
+  - "issuers.cert-manager.io"
+  - "orders.acme.cert-manager.io"
+
+# solver template global (applies to all solver templates)
+k4k8s_cm_acme_server: https://acme-v02.api.letsencrypt.org/directory
+k4k8s_cm_cluster_issuer_name: "letsencrypt-prod"
+
+# solver route53
+k4k8s_cm_route53_secret_name: "aws-route53-secret-access-key"
+k4k8s_cm_route53_secret_access_key_key: "aws-secret-access-key"

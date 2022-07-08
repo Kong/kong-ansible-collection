@@ -1,0 +1,18 @@
+---
+k4k8s_cm_helm_chart_values_files: []
+k4k8s_cm_helm_chart_values: {}
+k4k8s_cm_helm_chart_values_remote: false
+k4k8s_cm_acme_acct_email_address: ""
+k4k8s_cm_namespace: "cert-manager"
+# k4k8s_kubeconfig: ""
+# k4k8s_cluster_context: ""
+
+k4k8s_cm_create_cluster_issuer: true
+k4k8s_cm_solver: "http"  # http | route53
+
+# aws route53 solver settings
+k4k8s_cm_create_route53_secret: false
+k4k8s_cm_route53_access_key_id: ""
+k4k8s_cm_route53_secret_access_key: ""
+k4k8s_cm_route53_region: ""
+k4k8s_cm_route53_dns_zones: []

@@ -1,0 +1,7 @@
+---
+- name: "Ensure jetstack cert-manager cluster issuer configuration is present | http"
+  kubernetes.core.k8s:
+    state: "present"
+    definition: "{{ lookup('template', 'templates/cluster_issuer_route53.yaml.j2' | from_yaml) }}"
+  when: 
+    - "k4k8s_cm_acme_acct_email_address != ''"
