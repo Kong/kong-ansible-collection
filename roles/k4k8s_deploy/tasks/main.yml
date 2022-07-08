@@ -11,7 +11,7 @@
     - "deploy"
     - "deploy_k4k8s"
 
-- name: "Ensure kong for kubernetes prereqisite components are deployed"
+- name: "Ensure kong for kubernetes prerequisite components are deployed"
   ansible.builtin.include_tasks: "kubernetes_install/prerequisite.yml"
   tags:
     - "deploy"
