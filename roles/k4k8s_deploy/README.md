@@ -203,8 +203,8 @@ The following variables apply only when `k4k8s_deploy_method: "helm"` is set (de
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
 |`k4k8s_deploy_namespace`|The Kubernetes `namespace` or Red Hat OpenShift `project` to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, or Kong Kubernetes Ingress Controller to.|string|`"kong"`|yes|
-|`k4k8s_deploy_kubeconfig`|The path to your Kubernetes (`kubectl`) or Red Hat OpenShift CLI (`oc`) configuration file. This may be useful when working with multiple clusters and Kong deployment types.|string|`None` (unset)|no|
-|`k4k8s_deploy_cluster_context`|The context to use for operating on a Kubernetes or Red Hat OpenShift cluster.  If not specified, the current context set in your `k4k8s_deploy_kubeconfig` will be used.  This may be useful when working with multiple clusters and Kong deployment types.|string|`None` (unset)|no|
+|`k4k8s_kubeconfig`|The path to your Kubernetes (`kubectl`) or Red Hat OpenShift CLI (`oc`) configuration file. This may be useful when working with multiple clusters and Kong deployment types.|string|`None` (unset)|no|
+|`k4k8s_cluster_context`|The context to use for operating on a Kubernetes or Red Hat OpenShift cluster.  If not specified, the current context set in your `k4k8s_kubeconfig` will be used.  This may be useful when working with multiple clusters and Kong deployment types.|string|`None` (unset)|no|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -274,7 +274,7 @@ The following example assumes you already have all the necessary kubeconfigs in 
         name: "kong.kong.k4k8s_deploy"
         public: True # to be able to validate registered vars later
       vars:
-        k4k8s_deploy_cluster_context: "kong-cp"
+        k4k8s_cluster_context: "kong-cp"
         k4k8s_deploy_helm_chart_values_files:
           - "kong-controlplane-values.yaml"
         k4k8s_deploy_create_enterprise_superuser_password_secret: True
@@ -300,7 +300,7 @@ The following example assumes you already have all the necessary kubeconfigs in 
         name: "kong.kong.k4k8s_deploy"
         public: True # to be able to validate registered vars later
       vars:
-        k4k8s_deploy_cluster_context: "{{ item }}"
+        k4k8s_cluster_context: "{{ item }}"
         k4k8s_deploy_helm_chart_values_files:
           - "kong-dataplane-values.yaml"
         k4k8s_deploy_create_enterprise_license_secret: True

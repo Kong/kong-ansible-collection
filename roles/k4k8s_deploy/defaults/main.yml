@@ -70,5 +70,5 @@ k4k8s_deploy_portal_sessions_settings:
 
 # k4k8s-deploy Kubernetes & Red Hat OpenShift config
 k4k8s_deploy_namespace: "kong"
-# k4k8s_deploy_kubeconfig: "~/.kube/config"
-# k4k8s_deploy_cluster_context: ""  # set when you have more than one context in your kubeconfig
+# k4k8s_kubeconfig: "~/.kube/config"
+# k4k8s_cluster_context: ""  # set when you have more than one context in your kubeconfig

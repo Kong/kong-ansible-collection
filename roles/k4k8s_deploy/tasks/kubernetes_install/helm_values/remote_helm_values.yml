@@ -4,7 +4,7 @@
     src: "{{ __k4k8s_deploy_remote_helm_value_file__ }}"
   register: "__k4k8s_deploy_slurped_values__"
 
-- name: "Ensure 'k4k8s_deploy_helm_chart_values' values are available"
+- name: "Ensure '__k4k8s_deploy_remote_helm_value_file__' values are available"
   ansible.builtin.set_fact:
     __k4k8s_deploy_helm_release_values__: "{{ __k4k8s_deploy_helm_release_values__ | combine(__k4k8s_deploy_slurped_values__['content'] |
                                               b64decode | from_yaml) }}"

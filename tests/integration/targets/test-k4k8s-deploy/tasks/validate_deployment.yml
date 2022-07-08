@@ -24,8 +24,8 @@
     kubernetes.core.k8s_info:
       wait: true
       wait_timeout: 600
-      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
-      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
       namespace: "{{ k4k8s_deploy_namespace }}"
   block:
     - name: "Collect namespace resource"

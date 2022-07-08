@@ -7,13 +7,13 @@
     kubernetes.core.k8s_info:
       wait: true
       wait_timeout: 600
-      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
-      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
     kubernetes.core.k8s:
       wait: true
       wait_timeout: 600
-      kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
-      context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
   block:
     - name: "Ensure 'kube-flannel-ds' DaemonSet status is 'Ready'"
       kubernetes.core.k8s_info:

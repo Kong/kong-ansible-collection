@@ -1,16 +1,16 @@
 ---
 - name: "Ensure yaml manifest is applied (copied to {{ inventory_hostname }}) | {{ __k4k8s_deploy_yaml_path__ }}"
   kubernetes.core.k8s:
-    context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
-    kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     src: "{{ __k4k8s_deploy_manifest_dir__.path }}/{{ __k4k8s_deploy_yaml_path__ | basename }}"
     state: "present"
   when: "not k4k8s_deploy_yaml_manifest_paths_remote | default(False) | bool"
 
 - name: "Ensure yaml manifest is applied (remote) | {{ __k4k8s_deploy_yaml_path__ }}"
   kubernetes.core.k8s:
-    context: "{{ k4k8s_deploy_cluster_context | default(omit) }}"
-    kubeconfig: "{{ k4k8s_deploy_kubeconfig | default(omit) }}"
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     src: "{{ __k4k8s_deploy_yaml_path__ }}"
     state: "present"
   when: "k4k8s_deploy_yaml_manifest_paths_remote | default(False) | bool"
