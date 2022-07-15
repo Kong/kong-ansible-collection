@@ -11,7 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get the version name from the tags
+        run: echo "RELEASE_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+      # source: https://github.com/artis3n/ansible_galaxy_collection
       - name: Publish the collection to Ansible Galaxy
         uses: artis3n/ansible_galaxy_collection@v2
         with:
           api_key: "${{ secrets.GALAXY_API_KEY }}"
+          galaxy_version: "${{ env.RELEASE_VERSION }}"
+      
+      - name: Publish the collection to Red Hat Automation Hub
+        run: |
+          cat << EOF > ansible.cfg
+          [galaxy]
+          server_list = rh_automation_hub
+          [galaxy_server.rh_automation_hub]
+          url=${{ secrets.RH_AUTOMATION_HUB_URL }}
+          auth_url=${{ secrets.RH_SSO_URL }}
+          token=${{ secrets.RH_AUTOMATION_HUB_TOKEN }}
+          EOF
+          ansible-galaxy collection publish ./kong-kong-${{ env.RELEASE_VERSION }}.tar.gz
