@@ -26,10 +26,6 @@ k4k8s_cm_crd_names:
   - "issuers.cert-manager.io"
   - "orders.acme.cert-manager.io"
 
-# solver template global (applies to all solver templates)
-k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
-k4k8s_cm_cluster_issuer_name: "letsencrypt-prod"
-
 # solver route53
 k4k8s_cm_route53_secret_name: "aws-route53-secret-access-key"
 k4k8s_cm_route53_secret_access_key_key: "aws-secret-access-key"

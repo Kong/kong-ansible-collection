@@ -116,7 +116,9 @@ These variables apply when `k4k8s_cm_create_cluster_issuer: true`.
 |---|---|---|---|---|
 |`k4k8s_cm_create_cluster_issuer`|Whether or not to deploy a cert-manager `ClusterIssuer`. The current `ClusterIssuer` configurations available with this Kong for Kubernetes integration leverage the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/). To learn more about the concept of `Issuer` and `ClusterIssuer` resources, see the cert-manager [Issuer Configuration](https://cert-manager.io/docs/configuration/) documentation.|boolean|`false`|yes|
 |`k4k8s_cm_solver`|Cert-manager must resolve requests for new ACME TLS certificate requests with a "solver".  The certificate issuer checks the solver to validate a domain belongs to the requester.  This role currently supports a pre-defined http-based solver that will function with Kong's products, as well as a DNS based solver configuration for AWS Route53.  Use the setting value of `"http_acme"` for the http solver ClusterIssuer configuration.  Use the value of `dns_route53_acme` for the AWS Route53 DNS solver ClusterIssuer configuration.|string|`"http_acme"`|no|
+|`k4k8s_cm_cluster_issuer_name`|Name of the `ClusterIssuer` Kubernetes or Red Hat OpenShift resource to create|string|`"letsencrypt-prod"`|no|
 |`k4k8s_cm_acme_acct_email_address`|An email address is required when requesting certificates via [Let's Encrypt](https://letsencrypt.org/how-it-works/).  Please specify a preferred email address.|string|`""`|no|
+|`k4k8s_cm_acme_server`|The ACME protocol Let's Encrypt server to use when requesting TLS certificates.|string|`"https://acme-v02.api.letsencrypt.org/directory"`|no|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -174,8 +176,6 @@ The variables defined in the sections below are available for deeper configurati
 | --- | --- | --- | --- | --- |
 |`k4k8s_cm_crd_install_url`|URL to install the cert-manager CRDs for Kubernetes or Red Hat OpenShift from.|string|`"https://github.com/cert-manager/cert-manager/releases/download/{{ k4k8s_cm_helm_chart_version }}/cert-manager.crds.yaml"`|no|
 |`k4k8s_cm_crd_names`|Used to perform an idempotency check to verify if the cert-manager CRDs have already been installed on the cluster.|list/array|see [vars/main.yml](https://github.com/Kong/kong-ansible-collection/blob/main/roles/k4k8s_cert_manager/vars/main.yml)|no|
-|`k4k8s_cm_acme_server`|The ACME protocol Let's Encrypt server to use when requesting TLS certificates.|string|`"https://acme-v02.api.letsencrypt.org/directory"`|no|
-|`k4k8s_cm_cluster_issuer_name`|Name of the `ClusterIssuer` Kubernetes or Red Hat OpenShift resource to create|string|`"letsencrypt-prod"`|no|
 |`k4k8s_cm_route53_secret_name`|Name of the Kubernetes or Red Hat OpenShift secret to store the AWS Route53 `k4k8s_cm_route53_secret_access_key` in.|string|`"aws-route53-secret-access-key"`|no|
 |`k4k8s_cm_route53_secret_access_key_key`|Name of the dictionary key within the `k4k8s_cm_route53_secret_name` secret to store the `k4k8s_cm_route53_secret_access_key` data in.|string|`"aws-secret-access-key"`|no|
 

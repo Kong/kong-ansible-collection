@@ -12,7 +12,9 @@ k4k8s_cm_helm_chart_values_remote: false
 # k4k8s_cert_manager ACME ClusterIssuer settings
 k4k8s_cm_create_cluster_issuer: false
 k4k8s_cm_solver: "http_acme"  # http_acme | dns_route53_acme
+k4k8s_cm_cluster_issuer_name: "letsencrypt-prod"
 k4k8s_cm_acme_acct_email_address: ""
+k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
 
 # k4k8s_cert_manager DNS ACME ClusterIssuer solver AWS Route53 settings
 k4k8s_cm_route53_access_key_id: ""

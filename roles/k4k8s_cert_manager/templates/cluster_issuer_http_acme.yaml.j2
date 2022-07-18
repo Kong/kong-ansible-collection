@@ -2,7 +2,6 @@
 kind: ClusterIssuer
 metadata:
   name: {{ k4k8s_cm_cluster_issuer_name }}
-  namespace: {{ k4k8s_cm_namespace }}
 spec:
   acme:
     email: {{ k4k8s_cm_acme_acct_email_address }}
@@ -12,9 +11,9 @@ spec:
     solvers:
       - http01:
           ingress:
-          podTemplate:
-            metadata:
-              annotations:
-                kuma.io/sidecar-injection: "false"
-                sidecar.istio.io/inject: "false"
+            podTemplate:
+              metadata:
+                annotations:
+                  kuma.io/sidecar-injection: "false"
+                  sidecar.istio.io/inject: "false"
             class: "kong"
