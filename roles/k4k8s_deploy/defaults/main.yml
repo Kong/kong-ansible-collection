@@ -1,19 +1,19 @@
 ---
-# k4k8s-deploy role behavior config
+# k4k8s_deploy role behavior config
 k4k8s_deploy_method: "helm"  # helm | yaml_manifest
 
 
-# k4k8s-deploy Helm3 config - set when k4k8s_deploy_method: "helm"
+# k4k8s_deploy Helm3 config - set when k4k8s_deploy_method: "helm"
 k4k8s_deploy_helm_chart_values_files: []
 k4k8s_deploy_helm_chart_values_remote: false  # Set to true when the k4k8s_deploy_helm_chart_values_files are stored on a remote target host (not control node)
 k4k8s_deploy_helm_chart_values: {}
 
 
-# k4k8s-deploy YAML Manifest config - set when k4k8s_deploy_method: "yaml_manifest"
+# k4k8s_deploy YAML Manifest config - set when k4k8s_deploy_method: "yaml_manifest"
 k4k8s_deploy_yaml_manifest_paths: []
 k4k8s_deploy_yaml_manifest_paths_remote: false  # Set to True when the k4k8s_deploy_yaml_manifest_paths are stored on a remote target host (not control node)
 
-# k4k8s-deploy Kong config
+# k4k8s_deploy Kong config
 k4k8s_deploy_create_enterprise_license_secret: false
 k4k8s_deploy_enterprise_license_secret_name: "kong-enterprise-license"
 k4k8s_deploy_enterprise_license_secret_key: "license"
@@ -61,7 +61,7 @@ k4k8s_deploy_portal_sessions_settings:
   secret: "please-change-me"
   # storage: "cookie"
 
-# k4k8s-deploy Kubernetes & Red Hat OpenShift config
+# k4k8s_deploy Kubernetes & Red Hat OpenShift config
 k4k8s_deploy_namespace: "kong"
 # k4k8s_kubeconfig: "~/.kube/config"
 # k4k8s_cluster_context: ""  # set when you have more than one context in your kubeconfig
