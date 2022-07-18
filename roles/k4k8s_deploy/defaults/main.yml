@@ -1,12 +1,5 @@
 ---
 # k4k8s-deploy role behavior config
-k4k8s_deploy_validate_python_dependencies: true
-k4k8s_deploy_install_python_dependencies: false
-k4k8s_deploy_python_package_manager: "pip"  # pip | pipx
-k4k8s_deploy_validate_ansible_collection_dependencies: true
-k4k8s_deploy_install_ansible_collection_dependencies: false
-k4k8s_deploy_validate_binary_dependencies: true
-k4k8s_deploy_install_binary_dependencies: false
 k4k8s_deploy_method: "helm"  # helm | yaml_manifest
 
 
