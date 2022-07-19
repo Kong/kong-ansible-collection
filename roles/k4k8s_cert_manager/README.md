@@ -6,8 +6,7 @@
 
 ## Description
 
-An Ansible role to deploy [cert-manager](https://cert-manager.io) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of TLS certificates with Kong for Kubernetes ingresses.  The role can optionally deploy a cert-manager `ClusterIssuer` for the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/) using either a http solver or DNS solver.
-
+An Ansible role to deploy [cert-manager](https://cert-manager.io) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of TLS certificates with Kong for Kubernetes ingresses.  The role can optionally currently deploy a cert-manager `ClusterIssuer` for the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/) using either a HTTP01 solver or DNS01 solver.
 
 
 ## Table of Contents
@@ -32,7 +31,13 @@ An Ansible role to deploy [cert-manager](https://cert-manager.io) on a Kubernete
 6. [Advanced Variables](#advanced-variables)
     1. [Helm](#helm)
     2. [Cert-manager deployment and configuration](#cert-manager-deployment-and-configuration)
+    3. [Collected result variables and other set facts or variables](#collected-result-variables-and-other-set-facts-or-variables)
 7. [Playbook usage examples and how-to guide](#playbook-usage-examples-and-how-to-guide)
+    1. [Deploy cert-manager with no ClusterIssuer](#deploy-cert-manager-with-no-clusterissuer)
+    2. [Deploy cert-manager ACME HTTP01 solver ClusterIssuer configuration](#deploy-cert-manager-acme-http01-solver-clusterissuer-configuration)
+    3. [Deploy cert-manager ACME DNS01 solver ClusterIssuer configuration](#deploy-cert-manager-acme-dns01-solver-clusterissuer-configuration)
+    4. [Securing Kong Ingresses with cert-manager](#securing-kong-ingresses-with-cert-manager)
+    5. [Exposing and Securing Kong Ingresses for Kong Enterprise Services](#exposing-and-securing-kong-ingresses-for-kong-enterprise-services)
 8. [License](#license)
 9. [Author](#author)
 
@@ -115,7 +120,7 @@ These variables apply when `k4k8s_cm_create_cluster_issuer: true`.
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
 |`k4k8s_cm_create_cluster_issuer`|Whether or not to deploy a cert-manager `ClusterIssuer`. The current `ClusterIssuer` configurations available with this Kong for Kubernetes integration leverage the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/). To learn more about the concept of `Issuer` and `ClusterIssuer` resources, see the cert-manager [Issuer Configuration](https://cert-manager.io/docs/configuration/) documentation.|boolean|`false`|yes|
-|`k4k8s_cm_solver`|Cert-manager must resolve requests for new ACME TLS certificate requests with a "solver".  The certificate issuer checks the solver to validate a domain belongs to the requester.  This role currently supports a pre-defined http-based solver that will function with Kong's products, as well as a DNS based solver configuration for AWS Route53.  Use the setting value of `"http_acme"` for the http solver ClusterIssuer configuration.  Use the value of `dns_route53_acme` for the AWS Route53 DNS solver ClusterIssuer configuration.|string|`"http_acme"`|no|
+|`k4k8s_cm_cluster_issuer_config`|Cert-manager must resolve requests for new ACME TLS certificate requests with a "solver".  The certificate `Issuer` or `ClusterIssuer` checks the solver to validate a domain belongs to the requester.  This role currently supports a pre-defined http-based solver for configuration for the ACME protocol that will function with Kong's products, as well as a DNS based solver configuration for AWS Route53 with the ACME protocol.  Use the setting value of `"http_acme"` for the http solver ClusterIssuer configuration.  Use the value of `dns_route53_acme` for the AWS Route53 DNS solver ClusterIssuer configuration.|string|`"http_acme"`|no|
 |`k4k8s_cm_cluster_issuer_name`|Name of the `ClusterIssuer` Kubernetes or Red Hat OpenShift resource to create|string|`"letsencrypt-prod"`|no|
 |`k4k8s_cm_acme_acct_email_address`|An optional email address to use when requesting certificates via [Let's Encrypt](https://letsencrypt.org/how-it-works/).  This will be used for notifications of expiring certificates.|string|`""`|no|
 |`k4k8s_cm_acme_server`|The ACME protocol Let's Encrypt server to use when requesting TLS certificates.|string|`"https://acme-v02.api.letsencrypt.org/directory"`|no|
@@ -184,23 +189,185 @@ The variables defined in the sections below are available for deeper configurati
 ---
 
 
+### Collected result variables and other set facts or variables
+
+The following table of variables may be useful for debugging purposes.  You can access them after the `kong.kong.k4k8s-deploy` role has completed its run.  If running the `kong.kong.k4k8s-deploy` role via `ansible.builtin.include_role` you will need to add `public: True` to the module parameters, which allows you to access role variables after they have completed running.
+
+|Variable name|Description|
+|---|---|
+|`__k4k8s_cm_helm_results__`|The results collected from applying the cert-manager Helm chart via the `kubernetes.core.helm` Ansible module|
+
+**[Table of Contents](#table-of-contents)**
+
+---
+
+
 ## Playbook usage examples and how-to guide
+
+
+### Deploy cert-manager with no ClusterIssuer
 
 ```yaml
 ---
 - name: "Ensure cert-manager is deployed for Kong"
   hosts: "localhost"
-  vars_files:
-    - /path/to/my/ansible_vault.yml
   tasks:
     - name: "Ensure cert-manager is deployed with no ClusterIssuer"
       ansible.builtin.include_role:
         name: "kong.kong.k4k8s_cert_manager"
+      vars:
+        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
 ```
 
-**[Table of Contents](#table-of-contents)**
+
+### Deploy cert-manager ACME HTTP01 solver ClusterIssuer configuration
+
+```yaml
+---
+- name: "Ensure cert-manager is deployed for Kong with ACME HTTP01 solver ClusterIssuer"
+  hosts: "localhost"
+  tasks:
+    - name: "Ensure cert-manager is deployed with ACME HTTP01 solver ClusterIssuer"
+      ansible.builtin.include_role:
+        name: "kong.kong.k4k8s_cert_manager"
+      vars:
+        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
+        k4k8s_cm_create_cluster_issuer: true
+        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
+        k4k8s_cm_cluster_issuer_config: "http_acme"
+        k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-http"
+        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+```
+
+
+### Deploy cert-manager ACME DNS01 solver ClusterIssuer configuration
+
+```yaml
+---
+- name: "Ensure cert-manager is deployed for Kong with ACME DNS01 solver ClusterIssuer"
+  hosts: "localhost"
+  vars_files:
+    - /path/to/my/ansible_vault.yml
+  tasks:
+    - name: "Ensure cert-manager is deployed with ACME DNS01 solver ClusterIssuer"
+      ansible.builtin.include_role:
+        name: "kong.kong.k4k8s_cert_manager"
+      vars:
+        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
+        k4k8s_cm_create_cluster_issuer: true
+        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
+        k4k8s_cm_cluster_issuer_config: "dns_route53_acme"
+        k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-dns"
+        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+        k4k8s_cm_route53_access_key_id: "{{ access_key_id_from_ansible_vault }}"
+        k4k8s_cm_route53_secret_access_key: "{{ secret_access_key_id_from_ansible_vault }}"
+        k4k8s_cm_route53_region: "us-east-1"
+        k4k8s_cm_route53_dns_zones:
+          - "demo.mydomain.com"
+          - "mydomain.com"
+          - "another.domain.com"
+```
+
+### Securing Kong Ingresses with cert-manager
+
+Now that you've deployed cert-manager with one of the examples above, it's time to deploy some TLS certificates.
+
+Requirements:
+  * A `ClusterIssuer` must first be available on the Kubernetes or Red Hat OpenShift cluster.  You can deploy one with this Ansible Role.  See the examples above on how to do this.
+
+1. Edit one of your existing Kong `Ingress` resources and add the annotation `cert-manager.io/cluster-issuer: "letsencrypt-prod"`.  The value of the `cert-manager.io/cluster-issuer` must match one of your `ClusterIssuer`s `metadata.name`.  The default name of the `ClusterIssuer` deployed with this Ansible role is `letsencrypt-prod`.  If you changed your `ClusterIssuer`'s name with the `k4k8s_cm_cluster_issuer_name` variable, then the annotation must match the name of your `ClusterIssuer`.  You can find a full list of supported cert-manager annotations [here](https://cert-manager.io/docs/usage/ingress/#supported-annotations).
+
+1. Your Kong `Ingress` will have a few other fields filled that not only tell Kong Ingress Controller how to operate, but also relate to cert-manager's request process:
+![](docs/img/cert-manager-example.png)
+
+1. Once the changes are applied to the Kong `Ingress` cert-manager will automatically deploy a TLS certificate.
+
+
+### Exposing and Securing Kong Ingresses for Kong Enterprise Services
+
+If you make use of the `kong.kong.k4k8s_deploy` role to deploy your Kong Enterprise instances, then you can easily deploy Kong Ingresses with cert-manager certificates.  Here's a simple way to do it without needing to modify a refined Helm values file:
+
+```yaml
+- name: "Ensure cert-manager is deployed for Kong with ACME DNS01 solver ClusterIssuer"
+  hosts: "localhost"
+  vars_files:
+    - /path/to/my/ansible_vault.yml
+  vars:
+    ingress_dns_zone: "example.com"
+    k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-http"
+  tasks:
+    - name: "Ensure cert-manager is deployed to kong control-plane cluster"
+      ansible.builtin.include_role:
+        name: "kong.kong.k4k8s_cert_manager"
+      vars:
+        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
+        k4k8s_cm_create_cluster_issuer: true
+        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
+        k4k8s_cm_cluster_issuer_config: "http_acme"
+        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+
+    - name: "Ensure kong control-plane is present and configured"
+      ansible.builtin.include_role:
+        name: "kong.kong.k4k8s_deploy"
+      vars:
+        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
+        k4k8s_deploy_create_enterprise_superuser_password_secret: true
+        k4k8s_deploy_enterprise_license_json_string: "{{ kong_enterprise_license_from_vault }}"
+        k4k8s_deploy_enterprise_superuser_password: "{{ kong_enterprise_admin_pass_from_vault }}"
+        k4k8s_deploy_create_postgres_password_secret: true
+        k4k8s_deploy_postgres_admin_password: "{{ pgsql_admin_pass_from_vault }}"
+        k4k8s_deploy_postgres_user_password: "{{ pgsql_user_pass_from_vault }}"
+        k4k8s_deploy_create_hybrid_mode_cp_cert_secret: true
+        k4k8s_deploy_create_admin_gui_sessions_conf_secret: true
+        k4k8s_deploy_admin_gui_sessions_settings:
+          cookie_domain: ".{{ ingress_dns_zone }}"
+          cookie_name: "oatmeal-raisin"
+          cookie_samesite: "off"
+          cookie_secure: true
+          secret: "thisisverysecret"
+        k4k8s_deploy_create_portal_sessions_conf_secret: true
+        k4k8s_deploy_portal_sessions_settings:
+          cookie_domain: ".{{ ingress_dns_zone }}"
+          cookie_name: "chocolate-chip"
+          cookie_samesite: "off"
+          cookie_secure: true
+          secret: "thisisreallysecret"
+        k4k8s_deploy_helm_chart_values_files:
+          - "kong-enterprise-values.yaml"
+        # the following lets us recycle a common helm values file for multiple kong environments
+        k4k8s_deploy_helm_chart_values:
+          admin:
+            ingress:
+              tls: "admin-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"  # produces a certificate secret with name admin-example-com-tls
+              hostname: "admin.{{ ingress_dns_zone }}"  # produces a hostname of admin.example.com
+              annotations:
+                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"  # adds the ClusterIssuer annotation to the Kong Ingress
+          manager:
+            ingress:
+              tls: "manager-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
+              hostname: "manager.{{ ingress_dns_zone }}"
+              annotations:
+                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
+          portal:
+            ingress:
+              tls: "portal-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
+              hostname: "portal.{{ ingress_dns_zone }}"
+              annotations:
+                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
+          portalapi:
+            ingress:
+              tls: "portalapi-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
+              hostname: "portalapi.{{ ingress_dns_zone }}"
+              annotations:
+                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
+```
+
+In the example above, you will need to create a CNAME DNS record pointing to your Kong proxy service's `LoadBalancer` IP for each of the hostname's in `k4k8s_deploy_helm_chart_values`.  This can be achieved automatically with further automation or [external-dns](https://github.com/kubernetes-sigs/external-dns) running on your cluster and configured for your DNS provider.  
+
+This, of course, is a more advanced sample and much of this is dependent on your Helm values file settings.  Much of your focus should be on what's being done with the `k4k8s_deploy_helm_chart_values` variable, which will override settings within the `k4k8s_deploy_helm_chart_values_files`, creating Kong `Ingress` resources with cert-manager annotations.
 
 ---
+**[Table of Contents](#table-of-contents)**
 
 
 ## License
@@ -214,4 +381,3 @@ The variables defined in the sections below are available for deeper configurati
 
 **[Table of Contents](#table-of-contents)**
 
----
