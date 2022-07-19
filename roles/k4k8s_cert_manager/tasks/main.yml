@@ -1,0 +1,95 @@
+---
+- name: "Ensure cert-manager helm chart repository is present"
+  kubernetes.core.helm_repository:
+    binary_path: "{{ k4k8s_cm_helm_binary_path | default('helm') }}"
+    repo_name: "{{ k4k8s_cm_helm_chart_repo_name }}"
+    repo_password: "{{ k4k8s_cm_helm_chart_repo_password | default(omit) }}"
+    repo_state: "present"
+    repo_url: "{{ k4k8s_cm_helm_chart_repo_url }}"
+    repo_username: "{{ k4k8s_cm_helm_chart_repo_username | default(omit) }}"
+
+- name: "cert-manager helm deployment"
+  module_defaults:
+    kubernetes.core.helm:
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    kubernetes.core.k8s:
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    kubernetes.core.k8s_info:
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+  block:
+    - name: "Ensure cert-manager CRDs are present"
+      block:
+        - name: "Collect currently installed CRDs from the cluster"
+          kubernetes.core.k8s_info:
+            kind: "CustomResourceDefinition"
+            name: "{{ item }}"
+          with_items: "{{ k4k8s_cm_crd_names }}"
+          register: "__k4k8s_cm_installed_crds__"
+
+        - name: "Cert-manager CRDs are absent"
+          ansible.builtin.fail:
+            msg: "Missing jetstack cert-manager CRDs on the cluster"
+          with_items: "{{ __k4k8s_cm_installed_crds__['results'] }}"
+          loop_control:
+            index_var: "loop_index"
+            label: "crd_result{{ loop_index }}"
+          when: "item['resources'] | length < 1"
+
+        - name: "Cert-manager CRDs are present"
+          ansible.builtin.debug:
+            msg: "The cert-manager CRDs are already present on the cluster"
+
+      rescue:
+        - name: "Ensure temporary directory for cert-manager CRDs is present"
+          ansible.builtin.tempfile:
+            state: "directory"
+            prefix: "k4k8s_cm"
+          register: "__k4k8s_cm_tempdir__"
+
+        - name: "Ensure cert-manager CRDs manifest is present"
+          ansible.builtin.get_url:
+            dest: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
+            mode: "0755"
+            url: "{{ k4k8s_cm_crd_install_url }}"
+
+        - name: "Ensure cert-manager CRDs are present"
+          kubernetes.core.k8s:
+            src: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
+            state: "present"
+            wait: true
+
+        - name: "Ensure temporary directory for cert-manager CRDs is absent"
+          ansible.builtin.file:
+            path: "{{ __k4k8s_cm_tempdir__['path'] }}"
+            state: "absent"
+
+    - name: "Ensure provided cert-manager helm chart values are available"
+      ansible.builtin.include_tasks: "helm_values/collect_helm_values.yml"
+
+    - name: "Ensure cert-manager is present"
+      kubernetes.core.helm:
+        atomic: "{{ k4k8s_cm_helm_atomic }}"
+        binary_path: "{{ k4k8s_cm_helm_binary_path | default('helm') }}"
+        chart_ref: "{{ k4k8s_cm_helm_chart_ref }}"
+        chart_version: "{{ k4k8s_cm_helm_chart_version | default(omit) }}"
+        # context: "{{ k4k8s_cluster_context | default(omit) }}"
+        create_namespace: true
+        disable_hook: "{{ k4k8s_cm_helm_disable_hook }}"
+        force: "{{ k4k8s_cm_helm_force_reinstall }}"
+        # kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+        release_name: "{{ k4k8s_cm_helm_release_name }}"
+        release_namespace: "{{ k4k8s_cm_namespace }}"
+        release_state: "present"
+        release_values: "{{ __k4k8s_cm_helm_release_values__ }}"
+        replace: "{{ k4k8s_cm_helm_replace }}"
+        skip_crds: false
+        update_repo_cache: "{{ k4k8s_cm_helm_update_repo }}"
+        wait: "{{ k4k8s_cm_helm_wait }}"
+      register: "__k4k8s_cm_helm_results__"
+
+    - name: "Ensure cert-manager cluster issuer is present"
+      ansible.builtin.include_tasks: "solvers/{{ k4k8s_cm_cluster_issuer_config }}.yml"
+      when: "k4k8s_cm_create_cluster_issuer | default(false) | bool"
