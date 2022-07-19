@@ -1,5 +1,5 @@
 ---
-- name: "Ensure jetstack cert-manager route53 secret is present"
+- name: "Ensure cert-manager AWS Route53 secret is present"
   kubernetes.core.k8s:
     state: "present"
     definition: "{{ lookup('template', 'templates/secrets/route53_secret.yaml.j2' | from_yaml) }}"
@@ -7,7 +7,7 @@
     - "k4k8s_cm_route53_access_key_id != ''"
     - "k4k8s_cm_route53_secret_access_key != ''"
 
-- name: "Ensure jetstack cert-manager cluster issuer configuration is present | aws route53"
+- name: "Ensure cert-manager cluster issuer configuration is present | AWS Route53"
   kubernetes.core.k8s:
     state: "present"
     definition: "{{ lookup('template', 'templates/cluster_issuer_dns_route53_acme.yaml.j2' | from_yaml) }}"

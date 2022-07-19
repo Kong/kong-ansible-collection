@@ -1,5 +1,5 @@
 ---
-- name: "Ensure jetstack cert-manager cluster issuer configuration is present | http"
+- name: "Ensure cert-manager cluster issuer configuration is present | http"
   kubernetes.core.k8s:
     state: "present"
     definition: "{{ lookup('template', 'templates/cluster_issuer_http_acme.yaml.j2' | from_yaml) }}"
