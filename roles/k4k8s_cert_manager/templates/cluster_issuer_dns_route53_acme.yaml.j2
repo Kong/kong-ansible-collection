@@ -4,7 +4,11 @@ metadata:
   name: {{ k4k8s_cm_cluster_issuer_name }}
 spec:
   acme:
+{% if k4k8s_cm_acme_acct_email_address is defined %}
+{% if k4k8s_cm_acme_acct_email_address != '' %}
     email: {{ k4k8s_cm_acme_acct_email_address }}
+{% endif %}
+{% endif %}
     privateKeySecretRef:
       name: {{ k4k8s_cm_cluster_issuer_name }}
     server: {{ k4k8s_cm_acme_server }}
