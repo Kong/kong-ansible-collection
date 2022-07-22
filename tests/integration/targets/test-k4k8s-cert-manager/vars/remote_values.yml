@@ -1,0 +1,7 @@
+---
+# Test remote file/values locations
+k4k8s_cm_helm_chart_values_remote: true
+
+# override initial paths for remote test setup that are loaded from vars/common.yml
+k4k8s_cm_helm_chart_values_files:
+  - "{{ __k4k8s_deploy_setup_dir__['path'] }}/values.yaml"

@@ -1,0 +1,80 @@
+---
+k4k8s_cm_namespace: "cert-manager"
+k4k8s_cm_cluster_issuer_config: "{{ cluster_issuer_config }}"
+k4k8s_cm_create_cluster_issuer: true
+# when k4k8s_cm_solver is set to "dns_route53_acme" the following apply
+k4k8s_cm_route53_access_key_id: "fake_id"
+k4k8s_cm_route53_secret_access_key: "fake_key"
+k4k8s_cm_route53_region: "us-east-1"
+k4k8s_cm_route53_dns_zones:
+  - "myzone.example.com"
+
+
+k4k8s_cm_helm_chart_values_files:
+  - "values.yaml"
+
+# dependency install mechanisms
+k4k8s_deploy_install_binary_dependencies: true
+k4k8s_deploy_install_python_dependencies: true
+k4k8s_deploy_install_ansible_collection_dependencies: true
+
+# Test all secret creation mechanisms
+
+
+
+### migrated from original role functionality
+# Python
+k4k8s_deploy_python_module_deps:
+  - "kubernetes"
+
+## pip
+# k4k8s_deploy_pyvenv_path: ""  # set if you need to specify your python virtual environment path for module installs
+k4k8s_deploy_python_package_manager: "pip"
+
+k4k8s_deploy_pip_executable_path: "pip3"
+k4k8s_deploy_python_umask: "0022"
+
+
+## pipx
+k4k8s_deploy_pipx_package: "ansible-core"  # set to function within default GitHub Actions runners
+k4k8s_deploy_pipx_executable_path: "pipx"
+
+# Ansible
+k4k8s_deploy_ansible_collection_deps:
+  - "community.general"
+  - "kubernetes.core"
+
+k4k8s_deploy_ansible_collection_deps_hybrid_certs: []
+  # - "community.crypto"
+
+# k4k8s_deploy_ansible_collection_path: ""
+k4k8s_deploy_ansible_galaxy_executable_path: "ansible-galaxy"
+
+# Binaries
+k4k8s_deploy_bin_deps:
+  - "openssl"
+
+k4k8s_deploy_bin_deps_helm_method:
+  - "helm"
+
+# k4k8s_deploy_bin_install_proxy_enabled: True  # Uncomment if you have set an environment var on your target hosts
+
+## the following is a table for all tarballs which is leveraged by the k4k8s_deploy_install_bin_tarballs* vars and must be listed prior to them
+k4k8s_deploy_bin_version_info:
+  helm:
+    checksum:
+      linux:
+        x86_64: "sha256:1484ffb0c7a608d8069470f48b88d729e88c41a1b6602f145231e8ea7b43b50a"
+    version: "v3.9.0"
+    baseurl: "https://get.helm.sh"
+    extension: "tar.gz"
+    destination: "/usr/local/bin"
+
+
+k4k8s_deploy_install_bin_tarballs: []
+
+k4k8s_deploy_install_bin_tarballs_helm_method:
+  - name: "helm"
+    extracted_dir: "{{ ansible_system | lower }}-{{ ansible_architecture | regex_replace('x86_64', 'amd64') }}"
+    dl_filename: "helm-{{ k4k8s_deploy_bin_version_info['helm']['version'] }}-{{ ansible_system | lower }}-{{ ansible_architecture | regex_replace('x86_64', 'amd64') }}.{{ k4k8s_deploy_bin_version_info['helm']['extension'] }}"
+    url: "{{ k4k8s_deploy_bin_version_info['helm']['baseurl'] }}/helm-{{ k4k8s_deploy_bin_version_info['helm']['version'] }}-{{ ansible_system | lower }}-{{ ansible_architecture | regex_replace('x86_64', 'amd64') }}.{{ k4k8s_deploy_bin_version_info['helm']['extension'] }}"

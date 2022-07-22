@@ -1,0 +1,8 @@
+---
+- name: "Ensure required ansible collections are installed"
+  community.general.ansible_galaxy_install:
+    dest: "{{ k4k8s_deploy_ansible_collection_path | default(omit) }}"
+    name: "{{ item }}"
+    type: "collection"
+  with_items: "{{ k4k8s_deploy_ansible_collection_deps }}"
+  delegate_to: "localhost"
