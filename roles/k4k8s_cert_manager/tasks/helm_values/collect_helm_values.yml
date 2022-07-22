@@ -27,7 +27,7 @@
         __k4k8s_cm_helm_release_values__: {}
 
     - name: "Ensure 'k4k8s_cm_helm_chart_values_files' values are available | remote values"
-      ansible.builtin.include_tasks: "kubernetes_install/helm_values/remote_helm_values.yml"
+      ansible.builtin.include_tasks: "helm_values/remote_helm_values.yml"
       with_items: "{{ k4k8s_cm_helm_chart_values_files }}"
       loop_control:
         loop_var: "__k4k8s_cm_remote_helm_value_file__"
