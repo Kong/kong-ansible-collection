@@ -62,13 +62,13 @@
     - name: "Test setup (remote) | Create temp directory"
       ansible.builtin.tempfile:
         state: "directory"
-        prefix: "k4k8s_deploy_setup"
-      register: "__k4k8s_deploy_setup_dir__"
+        prefix: "k4k8s_cm_setup"
+      register: "__k4k8s_cm_setup_dir__"
 
     - name: "Test setup (remote) | Copy files to remote"
       ansible.builtin.copy:
         src: "{{ item }}"
-        dest: "{{ __k4k8s_deploy_setup_dir__['path'] }}/{{ item | basename }}"
+        dest: "{{ __k4k8s_cm_setup_dir__['path'] }}/{{ item | basename }}"
         mode: "0755"
       with_items:
         - "{{ k4k8s_cm_helm_chart_values_files }}"
