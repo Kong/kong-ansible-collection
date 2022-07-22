@@ -62,20 +62,20 @@ jobs:
         values_location:
           - "remote_values"
           - "local_values"
-        # exclude:
+        exclude:
         #   # only run the remote_values test on ubuntu1804, 1 is good enough here
-        #   - operating_system: "ubuntu2004"
-        #     solver_config: "http_acme"
-        #     values_location: "remote_values"
-        #   - operating_system: "ubuntu2004"
-        #     deploy_method: "yaml_manifest"
-        #     values_location: "remote_values"
-        #   - operating_system: "opensuse15"
-        #     deploy_method: "helm"
-        #     values_location: "remote_values"
-        #   - operating_system: "opensuse15"
-        #     deploy_method: "yaml_manifest"
-        #     values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            cluster_issuer_config: "http_acme"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            cluster_issuer_config: "dns_route53_acme"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            cluster_issuer_config: "http_acme"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            cluster_issuer_config: "dns_route53_acme"
+            values_location: "remote_values"
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
@@ -146,26 +146,20 @@ jobs:
         values_location:
           - "remote_values"
           - "local_values"
-        # exclude:
+        exclude:
         #   # only run the remote_values test on ubuntu1804, 1 is good enough here
-        #   # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
-        #   #   deploy_method: "helm"
-        #   #   values_location: "remote_values"
-        #   # - operating_system: "quay.io/ansible/centos8-test-container:3.1.0 --python 3.6"
-        #   #   deploy_method: "yaml_manifest"
-        #   #   values_location: "remote_values"
-        #   - operating_system: "ubuntu2004"
-        #     deploy_method: "helm"
-        #     values_location: "remote_values"
-        #   - operating_system: "ubuntu2004"
-        #     deploy_method: "yaml_manifest"
-        #     values_location: "remote_values"
-        #   - operating_system: "opensuse15"
-        #     deploy_method: "helm"
-        #     values_location: "remote_values"
-        #   - operating_system: "opensuse15"
-        #     deploy_method: "yaml_manifest"
-        #     values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            cluster_issuer_config: "http_acme"
+            values_location: "remote_values"
+          - operating_system: "ubuntu2004"
+            cluster_issuer_config: "dns_route53_acme"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            cluster_issuer_config: "http_acme"
+            values_location: "remote_values"
+          - operating_system: "opensuse15"
+            cluster_issuer_config: "dns_route53_acme"
+            values_location: "remote_values"
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
