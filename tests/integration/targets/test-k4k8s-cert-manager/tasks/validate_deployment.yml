@@ -19,7 +19,7 @@
         kind: "Secret"
         name: "{{ k4k8s_cm_route53_secret_name }}"
       register: "__k4k8s_cm_cluster_issuer_secret_results__"
-      when: "k4k8s_cm_cluster_issuer == 'dns_route53_acme'"
+      when: "k4k8s_cm_cluster_issuer_config == 'dns_route53_acme'"
     
     - name: "Collect ClusterIssuer"
       kubernetes.core.k8s_info:
@@ -40,4 +40,4 @@
   ansible.builtin.assert:
     that:
       - "__k4k8s_cm_cluster_issuer_secret_results__['resources'][0]['data'][k4k8s_cm_route53_secret_access_key_key] | b64decode == k4k8s_cm_route53_secret_access_key"
-  when: "k4k8s_cm_cluster_issuer == 'dns_route53_acme'"
+  when: "k4k8s_cm_cluster_issuer_config == 'dns_route53_acme'"
