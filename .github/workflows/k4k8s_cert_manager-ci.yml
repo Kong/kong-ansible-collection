@@ -7,7 +7,13 @@ name: k4k8s_cert_manager
     paths:
       - ".github/workflows/k4k8s_cert_manager-dev-ci.yml"
       - "roles/k4k8s_cert_manager/**"
+      - "!roles/k4k8s_cert_manager/galaxy_requirements.yml"
+      - "!roles/k4k8s_cert_manager/requirements.txt"
       - "!roles/k4k8s_cert_manager/README.md"
+      - "roles/common/k4k8s_helm/**"
+      - "!roles/common/k4k8s_helm/README.md"
+      - "!roles/common/k4k8s_helm/galaxy_requirements.yml"
+      - "!roles/common/k4k8s_helm/requirements.txt"
       - "!README.md"
       - "tests/integration/integration_config.yml"
       - "tests/integration/targets/test-k4k8s-cert-manager/**"
