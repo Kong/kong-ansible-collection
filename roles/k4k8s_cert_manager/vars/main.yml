@@ -1,5 +1,5 @@
 # helm
-# k4k8s_cm_helm_binary_path: "helm"
+k4k8s_cm_helm_binary_path: "helm"
 # k4k8s_cm_helm_chart_repo_username: ""
 # k4k8s_cm_helm_chart_repo_password: ""
 k4k8s_cm_helm_atomic: false
