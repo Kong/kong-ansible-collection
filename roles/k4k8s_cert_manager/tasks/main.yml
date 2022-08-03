@@ -49,6 +49,13 @@
         path: "{{ __k4k8s_cm_tempdir__['path'] }}"
         state: "absent"
 
+- name: "Ensure namespace is present | {{ k4k8s_cm_namespace }}"
+  kubernetes.core.k8s:
+    name: "{{ k4k8s_cm_namespace }}"
+    api_version: "v1"
+    kind: "Namespace"
+    state: "present"
+
 - name: "Ensure cert-manager is present"
   ansible.builtin.include_role:
     name: "common/k4k8s_helm"
