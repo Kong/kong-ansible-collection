@@ -26,7 +26,7 @@ name: k4k8s_cert_manager dev branch
       - ready_for_review
       - review_requested
 
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 env:
   WORKING_DIR: "${{ github.workspace }}/ansible_collections/kong/kong"

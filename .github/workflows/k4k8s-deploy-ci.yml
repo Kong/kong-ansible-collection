@@ -25,7 +25,8 @@ name: k4k8s_deploy
     types:
       - ready_for_review
       - review_requested
-  workflow_dispatch:
+
+  workflow_dispatch: {}
 
 env:
   WORKING_DIR: "${{ github.workspace }}/ansible_collections/kong/kong"
