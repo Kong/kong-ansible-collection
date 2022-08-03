@@ -198,6 +198,7 @@ The following table of variables may be useful for debugging purposes.  You can 
 |Variable name|Description|
 |---|---|
 |`__k4k8s_cm_helm_results__`|The results collected from applying the cert-manager Helm chart via the `kubernetes.core.helm` Ansible module|
+|`__k4k8s_cm_helm_release_values__`|The combined values from your helm values files and helm values.  This is what gets applied during Helm chart deployment.  Good way to validate your chart values are being read as you expect them to. |
 
 **[Table of Contents](#table-of-contents)**
 
@@ -382,4 +383,3 @@ This, of course, is a more advanced sample and much of this is dependent on your
 [Andrew J. Huffman](https://github.com/ahuffman)
 
 **[Table of Contents](#table-of-contents)**
-
