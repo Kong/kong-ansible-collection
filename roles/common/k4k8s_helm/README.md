@@ -91,7 +91,7 @@ The following tables outline variables available in [defaults/main.yml](defaults
 |`k4k8s_cluster_context`|The context to use for operating on a Kubernetes or Red Hat OpenShift cluster.  If not specified, the current context set in your `k4k8s_kubeconfig` will be used.  This may be useful when working with multiple clusters.|string|`None` (unset)|no|
 
 
-### Helm deployment method variables
+### Helm values variables
 
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
