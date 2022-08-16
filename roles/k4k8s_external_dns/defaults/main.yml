@@ -1,0 +1,26 @@
+---
+# k4k8s_cert_manager Kubernetes/Red Hat OpenShift config
+k4k8s_edns_namespace: "external-dns"
+# k4k8s_kubeconfig: ""
+# k4k8s_cluster_context: ""
+
+# k4k8s_external_dns Helm3 config
+k4k8s_edns_helm_chart_values_files: []
+k4k8s_edns_helm_chart_values: {}
+k4k8s_edns_helm_chart_values_remote: false
+
+# k4k8s_edns role behavior
+k4k8s_edns_provider: "aws"  # "aws" | only AWS Route53 is fully-automated at this time
+
+# k4k8s_external_dns AWS Route53 provider settings
+k4k8s_edns_create_provider_secret: false  # only AWS Route53 is fully-automated at this time
+k4k8s_edns_aws_access_key_id: ""  # please store in vault
+k4k8s_edns_aws_secret_access_key: ""      # please store in vault
+
+# k4k8s_edns common behavior settings (set same as chart defaults)
+k4k8s_edns_domain_filters: [] # filter list of domains to manage
+k4k8s_edns_sync_policy: "upsert-only"
+k4k8s_edns_sync_interval: "1m"
+k4k8s_edns_txt_owner_id: ""
+k4k8s_edns_txt_prefix: ""
+k4k8s_edns_txt_suffix: ""
