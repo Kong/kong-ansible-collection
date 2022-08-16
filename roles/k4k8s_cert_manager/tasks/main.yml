@@ -53,7 +53,9 @@
   kubernetes.core.k8s:
     name: "{{ k4k8s_cm_namespace }}"
     api_version: "v1"
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
     kind: "Namespace"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     state: "present"
 
 - name: "Ensure cert-manager is present"
