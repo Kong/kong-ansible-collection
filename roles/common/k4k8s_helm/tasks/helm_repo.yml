@@ -1,0 +1,9 @@
+---
+- name: "Ensure {{ k4k8s_helm_component_name }} helm chart repository is present"
+  kubernetes.core.helm_repository:
+    binary_path: "{{ k4k8s_helm_binary_path }}"
+    repo_name: "{{ k4k8s_helm_chart_repo_name }}"
+    repo_password: "{{ k4k8s_helm_chart_repo_password | default(omit) }}"
+    repo_state: "present"
+    repo_url: "{{ k4k8s_helm_chart_repo_url }}"
+    repo_username: "{{ k4k8s_helm_chart_repo_username | default(omit) }}"
