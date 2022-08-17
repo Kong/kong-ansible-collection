@@ -1,53 +1,65 @@
 ---
-- name: "Ensure cert-manager CRDs are present"
+
+- name: "Ensure temporary directory for cert-manager CRDs is present"
+  ansible.builtin.tempfile:
+    state: "directory"
+    prefix: "k4k8s_cm"
+  register: "__k4k8s_cm_tempdir__"
+  changed_when: false
+
+- name: "Ensure latest cert-manager helm chart version is set"
+  when: "k4k8s_cm_helm_chart_version is not defined"
   block:
-    - name: "Collect currently installed CRDs from the cluster"
-      kubernetes.core.k8s_info:
-        context: "{{ k4k8s_cluster_context | default(omit) }}"
-        kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
-        kind: "CustomResourceDefinition"
-        name: "{{ item }}"
-      with_items: "{{ k4k8s_cm_crd_names }}"
-      register: "__k4k8s_cm_installed_crds__"
+    - name: "Ensure cert-manager helm chart repository is present"
+      ansible.builtin.include_role:
+        name: "common/k4k8s_helm"
+        public: true
+        tasks_from: "helm_repo"
+      vars:
+        k4k8s_helm_binary_path: "{{ k4k8s_cm_helm_binary_path }}"
+        k4k8s_helm_chart_repo_name: "{{ k4k8s_cm_helm_chart_repo_name }}"
+        k4k8s_helm_chart_repo_password: "{{ k4k8s_cm_helm_chart_repo_password | default(None) }}"
+        k4k8s_helm_chart_repo_url: "{{ k4k8s_cm_helm_chart_repo_url }}"
+        k4k8s_helm_chart_repo_username: "{{ k4k8s_cm_helm_chart_repo_username | default(None) }}"
+        k4k8s_helm_component_name: "cert-manager"
 
-    - name: "Cert-manager CRDs are absent"
-      ansible.builtin.fail:
-        msg: "Missing cert-manager CRDs on the cluster"
-      with_items: "{{ __k4k8s_cm_installed_crds__['results'] }}"
-      loop_control:
-        index_var: "loop_index"
-        label: "crd_result{{ loop_index }}"
-      when: "item['resources'] | length < 1"
+    - name: "Ensure cert-manager helm chart repo cache is updated"
+      ansible.builtin.command: "{{ k4k8s_helm_binary_path }} repo update {{ k4k8s_cm_helm_chart_repo_name }}"
+      changed_when: false
 
-    - name: "Cert-manager CRDs are present"
-      ansible.builtin.debug:
-        msg: "The cert-manager CRDs are already present on the cluster"
+    - name: "Collect available cert-manager helm chart versions"
+      ansible.builtin.command: "{{ k4k8s_helm_binary_path }} search repo {{ k4k8s_cm_helm_chart_repo_name }} -l -o json"
+      register: "__k4k8s_cm_chart_vers_raw__"
+      changed_when: false
+    
+    - name: "Ensure cert-manager helm chart versions are consumable"
+      ansible.builtin.set_fact:
+        __k4k8s_cm_chart_vers__: "{{ __k4k8s_cm_chart_vers_raw__['stdout'] | to_json | from_json }}"
+    
+    - name: "Ensure latest cert-manager helm chart version is set"
+      ansible.builtin.set_fact:
+        k4k8s_cm_helm_chart_version: "{{  __k4k8s_cm_chart_vers__[0]['version'] }}"
 
-  rescue:
-    - name: "Ensure temporary directory for cert-manager CRDs is present"
-      ansible.builtin.tempfile:
-        state: "directory"
-        prefix: "k4k8s_cm"
-      register: "__k4k8s_cm_tempdir__"
+- name: "Ensure cert-manager CRDs manifest is present"
+  ansible.builtin.get_url:
+    dest: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
+    mode: "0755"
+    url: "{{ k4k8s_cm_crd_install_url }}"
+  changed_when: false
 
-    - name: "Ensure cert-manager CRDs manifest is present"
-      ansible.builtin.get_url:
-        dest: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
-        mode: "0755"
-        url: "{{ k4k8s_cm_crd_install_url }}"
+- name: "Ensure cert-manager CRDs are present"
+  kubernetes.core.k8s:
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    src: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
+    state: "present"
+    wait: true
 
-    - name: "Ensure cert-manager CRDs are present"
-      kubernetes.core.k8s:
-        context: "{{ k4k8s_cluster_context | default(omit) }}"
-        kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
-        src: "{{ __k4k8s_cm_tempdir__['path'] }}/cert-manager.crds.yaml"
-        state: "present"
-        wait: true
-
-    - name: "Ensure temporary directory for cert-manager CRDs is absent"
-      ansible.builtin.file:
-        path: "{{ __k4k8s_cm_tempdir__['path'] }}"
-        state: "absent"
+- name: "Ensure temporary directory for cert-manager CRDs is absent"
+  ansible.builtin.file:
+    path: "{{ __k4k8s_cm_tempdir__['path'] }}"
+    state: "absent"
+  changed_when: false
 
 - name: "Ensure namespace is present | {{ k4k8s_cm_namespace }}"
   kubernetes.core.k8s:
@@ -62,6 +74,7 @@
   ansible.builtin.include_role:
     name: "common/k4k8s_helm"
     public: true
+    tasks_from: "helm_chart"
   vars:
     k4k8s_helm_atomic: "{{ k4k8s_cm_helm_atomic }}"
     k4k8s_helm_binary_path: "{{ k4k8s_cm_helm_binary_path }}"
@@ -83,7 +96,7 @@
     k4k8s_helm_update_repo: "{{ k4k8s_cm_helm_update_repo }}"
     k4k8s_helm_wait: "{{ k4k8s_cm_helm_wait }}"
 
-- name: "Set collected helm run facts"
+- name: "Set collected cert-manager helm run facts"
   ansible.builtin.set_fact:
     __k4k8s_cm_helm_results__: "{{ __k4k8s_helm_results__ }}"
     __k4k8s_cm_helm_release_values__: "{{ __k4k8s_helm_release_values__ }}"

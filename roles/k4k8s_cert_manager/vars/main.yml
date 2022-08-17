@@ -4,7 +4,7 @@ k4k8s_cm_helm_binary_path: "helm"
 # k4k8s_cm_helm_chart_repo_password: ""
 k4k8s_cm_helm_atomic: false
 k4k8s_cm_helm_chart_ref: "jetstack/cert-manager"
-k4k8s_cm_helm_chart_version: "v1.8.2"
+# k4k8s_cm_helm_chart_version: "v1.9.1"
 k4k8s_cm_helm_disable_hook: false
 k4k8s_cm_helm_force_reinstall: false
 k4k8s_cm_helm_release_name: "cert-manager"
