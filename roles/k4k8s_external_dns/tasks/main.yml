@@ -15,11 +15,13 @@
         prefix: "k4k8s_edns_"
         state: "directory"
       register: "__k4k8s_edns_values_dir__"
+      changed_when: false
     
     - name: "Ensure external-dns common helm values are present"
       ansible.builtin.template:
         src: "helm_values/common.yaml.j2"
         dest: "{{ __k4k8s_edns_values_dir__['path'] }}/edns_common.yaml"
+      changed_when: false
 
     - name: "Ensure external-dns {{ k4k8s_edns_provider }} provider secret is present"
       ansible.builtin.include_tasks: "providers/{{ k4k8s_edns_provider }}.yml"
@@ -78,3 +80,4 @@
       ansible.builtin.file:
         path: "{{ __k4k8s_edns_values_dir__['path'] }}"
         state: "absent"
+      changed_when: false
