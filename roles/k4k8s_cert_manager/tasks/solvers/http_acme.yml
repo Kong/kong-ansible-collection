@@ -1,8 +1,10 @@
 ---
 - name: "Ensure cert-manager cluster issuer configuration is present | http"
   kubernetes.core.k8s:
-    state: "present"
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
     definition: "{{ lookup('template', 'templates/cluster_issuer_http_acme.yaml.j2' | from_yaml) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    state: "present"
   when: 
     - "k4k8s_cm_acme_server != ''"
     - "k4k8s_cm_cluster_issuer_name != ''"
