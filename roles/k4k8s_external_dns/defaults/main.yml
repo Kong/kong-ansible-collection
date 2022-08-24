@@ -15,9 +15,9 @@ k4k8s_edns_provider: "aws"  # "aws" | only AWS Route53 is fully-automated at thi
 # k4k8s_external_dns AWS Route53 provider settings
 k4k8s_edns_create_provider_secret: false  # only AWS Route53 is fully-automated at this time
 k4k8s_edns_aws_access_key_id: ""  # please store in vault
-k4k8s_edns_aws_secret_access_key: ""      # please store in vault
+k4k8s_edns_aws_secret_access_key: ""  # please store in vault
 
-# k4k8s_edns common behavior settings (set same as chart defaults)
+# k4k8s_external_dns global settings (set same as chart defaults) and can be overridden with values files and values
 k4k8s_edns_domain_filters: [] # filter list of domains to manage
 k4k8s_edns_sync_policy: "upsert-only"
 k4k8s_edns_sync_interval: "1m"
