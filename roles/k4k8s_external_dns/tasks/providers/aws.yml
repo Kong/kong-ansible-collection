@@ -14,4 +14,3 @@
     src: "helm_values/{{ k4k8s_edns_provider }}.yaml.j2"
     dest: "{{ __k4k8s_edns_values_dir__['path'] }}/{{ k4k8s_edns_provider }}.yaml"
   changed_when: false
-  

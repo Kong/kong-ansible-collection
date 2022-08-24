@@ -16,7 +16,7 @@
         state: "directory"
       register: "__k4k8s_edns_values_dir__"
       changed_when: false
-    
+
     - name: "Ensure external-dns common helm values are present"
       ansible.builtin.template:
         src: "helm_values/common.yaml.j2"
@@ -74,7 +74,7 @@
       ansible.builtin.set_fact:
         __k4k8s_edns_helm_results__: "{{ __k4k8s_helm_results__ }}"
         __k4k8s_edns_helm_release_values__: "{{ __k4k8s_helm_release_values__ }}"
-  
+
   always:
     - name: "Ensure temporary directory for external-dns common values is absent"
       ansible.builtin.file:
