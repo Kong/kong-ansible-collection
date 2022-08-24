@@ -175,7 +175,7 @@ The variables defined in the sections below are available for deeper configurati
 |`k4k8s_cm_helm_chart_repo_url`|URL for cert-manager's helm chart repository.|string|`"https://charts.jetstack.io"`|no|
 |`k4k8s_cm_helm_chart_repo_username`|Username for helm chart access.|string|`None` (omitted)|no|
 |`k4k8s_cm_helm_chart_repo_password`|Password for helm chart access.|string|`None` (omitted)|no|
-|`k4k8s_cm_helm_chart_version`|Use if you need a particular Kong Helm Chart version, otherwise the latest chart will be used.|string|`"v1.8.2"`|no|
+|`k4k8s_cm_helm_chart_version`|Use if you need a particular cert-manager Helm Chart version, otherwise the latest chart will be used.|string|`None` (unset)|no|
 |`k4k8s_cm_helm_disable_hook`|Corresponds to the `helm` `--no-hooks` option.|boolean|`false`|no|
 |`k4k8s_cm_helm_force_reinstall`|Helm option to force reinstall, ignore on new install.|boolean|`False`|no|
 |`k4k8s_cm_helm_release_name`|Name of the helm release.|string|`"cert-manager"`|no|
@@ -204,7 +204,7 @@ The variables defined in the sections below are available for deeper configurati
 
 ### Collected result variables and other set facts or variables
 
-The following table of variables may be useful for debugging purposes.  You can access them after the `kong.kong.k4k8s-deploy` role has completed its run.  If running the `kong.kong.k4k8s-deploy` role via `ansible.builtin.include_role` you will need to add `public: True` to the module parameters, which allows you to access role variables after they have completed running.
+The following table of variables may be useful for debugging purposes.  You can access them after the `kong.kong.k4k8s_cert_manager` role has completed its run.  If running the `kong.kong.k4k8s_cert_manager` role via `ansible.builtin.include_role` you will need to add `public: True` to the module parameters, which allows you to access role variables after they have completed running.
 
 |Variable name|Description|
 |---|---|
