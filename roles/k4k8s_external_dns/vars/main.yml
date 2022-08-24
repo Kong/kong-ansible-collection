@@ -14,7 +14,9 @@ k4k8s_edns_helm_wait: true
 k4k8s_edns_helm_chart_repo_url: "https://kubernetes-sigs.github.io/external-dns/"
 k4k8s_edns_helm_chart_repo_name: "external-dns"
 
-# secret AWS Route53
-k4k8s_edns_aws_secret_name: "external-dns"
+# secrets
+k4k8s_edns_provider_secret_name: "external-dns"
+
+# AWS Route53 secret
 k4k8s_edns_aws_access_key_id_key: "aws_access_key_id"
 k4k8s_edns_aws_secret_access_key_key: "aws_secret_access_key"

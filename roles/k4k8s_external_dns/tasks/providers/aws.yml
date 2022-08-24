@@ -2,13 +2,11 @@
 - name: "Ensure external-dns {{ k4k8s_edns_provider }} secret is present"
   kubernetes.core.k8s:
     context: "{{ k4k8s_cluster_context | default(omit) }}"
-    definition: "{{ lookup('template', 'templates/secrets/aws.yaml.j2' | from_yaml) }}"
+    definition: "{{ lookup('template', 'templates/secrets/{{ k4k8s_edns_provider }}.yaml.j2' | from_yaml) }}"
     kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     state: "present"
-  when: 
-    - "k4k8s_edns_aws_access_key_id != ''"
-    - "k4k8s_edns_aws_secret_access_key != ''"
 
+# pre-populates the external-dns chart's 'env' value with the secretRef
 - name: "Ensure external-dns {{ k4k8s_edns_provider }} secret helm values are present"
   ansible.builtin.template:
     src: "helm_values/{{ k4k8s_edns_provider }}.yaml.j2"
