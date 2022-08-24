@@ -30,11 +30,11 @@
       ansible.builtin.command: "{{ k4k8s_helm_binary_path }} search repo {{ k4k8s_cm_helm_chart_repo_name }} -l -o json"
       register: "__k4k8s_cm_chart_vers_raw__"
       changed_when: false
-    
+
     - name: "Ensure cert-manager helm chart versions are consumable"
       ansible.builtin.set_fact:
         __k4k8s_cm_chart_vers__: "{{ __k4k8s_cm_chart_vers_raw__['stdout'] | to_json | from_json }}"
-    
+
     - name: "Ensure latest cert-manager helm chart version is set"
       ansible.builtin.set_fact:
         k4k8s_cm_helm_chart_version: "{{  __k4k8s_cm_chart_vers__[0]['version'] }}"
