@@ -91,7 +91,6 @@ The testing matrix is validated against the following `ansible-test` containers 
 |Test Container|Python Version|
 |---|---|
 |default|3.10|
-|centos8|3.6|
 |ubuntu1804|3.6|
 |ubuntu2004|3.8|
 |opensuse15|3.6|

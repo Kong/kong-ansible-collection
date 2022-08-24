@@ -83,7 +83,18 @@ ansible-galaxy install -r galaxy-requirements.yml
 
 ## Testing and Supported Platforms
 
-WIP
+This Ansible role was validated to function using [`ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_testing.html) and [this](../../.github/workflows/k4k8s_cert_manager-ci.yml) GitHub Actions workflow.
+
+The testing targets the latest version of Kubernetes available from [`microk8s`](https://microk8s.io/) a fully compliant and lightweight Kubernetes distribution and Red Hat OpenShift using the [`microshift-aio:latest`](https://microshift.io/) container image.
+
+The testing matrix is validated against the following `ansible-test` containers as target hosts and launched from the default `ansible-test` container:
+
+|Test Container|Python Version|
+|---|---|
+|default|3.10|
+|ubuntu1804|3.6|
+|ubuntu2004|3.8|
+|opensuse15|3.6|
 
 
 ## Default variables
