@@ -1,5 +1,4 @@
 ---
-
 - name: "Ensure temporary directory for cert-manager CRDs is present"
   ansible.builtin.tempfile:
     state: "directory"
