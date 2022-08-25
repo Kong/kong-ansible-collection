@@ -1,0 +1,13 @@
+---
+k4k8s_deploy_bin_pkgs: []
+
+k4k8s_deploy_install_pkg_repos: []
+  # - name: "kubernetes"
+  #   apt_key_id: "FEEA9169307EA071"
+  #   apt_key_keyring: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
+  #   apt_key_url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+  #   filename: "/etc/apt/sources.list.d/kubernetes.list"
+  #   repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+  #   update_cache: True
+  #   validate_certs: True
+  #   state: "present"

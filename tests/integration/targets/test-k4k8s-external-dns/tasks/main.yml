@@ -1,0 +1,85 @@
+---
+- name: "Dump ansible_facts"
+  ansible.builtin.debug:
+    var: "ansible_facts"
+
+- name: "Test setup | Ensure collections are available"
+  ansible.builtin.command: "ansible-galaxy collection install community.general"
+  delegate_to: "localhost"
+
+- name: "Test setup | include common test variables"
+  ansible.builtin.include_vars: "common.yml"
+
+- name: "Test setup | Install python dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/py_prereqs.yml"
+  when: "k4k8s_deploy_install_python_dependencies | bool"
+
+- name: "Test setup | Install ansible collection dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/ansible_collection_prereqs.yml"
+  when: "k4k8s_deploy_install_ansible_collection_dependencies | bool"
+  tags:
+    - "install_deps"
+    - "install_collection_deps"
+
+- name: "Ensure helm dependencies are included"
+  ansible.builtin.set_fact:
+    k4k8s_deploy_bin_deps: "{{ k4k8s_deploy_bin_deps | union(k4k8s_deploy_bin_deps_helm_method) }}"
+    k4k8s_deploy_install_bin_tarballs: "{{ k4k8s_deploy_install_bin_tarballs | union(k4k8s_deploy_install_bin_tarballs_helm_method) }}"
+
+- name: "Install binary dependencies"
+  ansible.builtin.include_tasks: "prerequisite_install/bin_prereqs.yml"
+  when: "k4k8s_deploy_install_binary_dependencies | bool"
+
+- name: "Test setup | Ensure kubeconfig is on remote target"
+  become: true
+  block:
+    - name: "Test setup | Edit kubeconfig for test container to access kubernetes running on host"
+      ansible.builtin.replace:
+        path: "{{ local_kubeconfig }}"
+        regexp: "127.0.0.1"
+        replace: "{{ k8s_instance }}"
+      delegate_to: "localhost"
+
+    - name: "Test setup | Create kubeconfig directory on target"
+      ansible.builtin.file:
+        state: "directory"
+        path: "/root/.kube"
+        mode: "0755"
+        owner: "root"
+        group: "root"
+
+    - name: "Test setup | Copy kubeconfig to target"
+      ansible.builtin.copy:
+        src: "{{ local_kubeconfig }}"
+        dest: "/root/.kube/config"
+        mode: "0600"
+        owner: "root"
+        group: "root"
+
+- name: "Test setup (remote) | Copy files to remote"
+  when: "values_location == 'remote_values'"
+  block:
+    - name: "Test setup (remote) | Create temp directory"
+      ansible.builtin.tempfile:
+        state: "directory"
+        prefix: "k4k8s_edns_setup"
+      register: "__k4k8s_edns_setup_dir__"
+
+    - name: "Test setup (remote) | Copy files to remote"
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ __k4k8s_edns_setup_dir__['path'] }}/{{ item | basename }}"
+        mode: "0755"
+      with_items:
+        - "{{ k4k8s_edns_helm_chart_values_files }}"
+
+- name: "Test setup | include {{ values_location }} variables"
+  ansible.builtin.include_vars: "{{ values_location }}.yml"
+
+- name: "Test | k4k8s_external_dns role"
+  ansible.builtin.include_role:
+    name: "k4k8s_external_dns"
+    public: true # so we can validate using the same role variables later
+
+# - name: "Validate deployment"
+#   ansible.builtin.include_tasks: "validate_deployment.yml"

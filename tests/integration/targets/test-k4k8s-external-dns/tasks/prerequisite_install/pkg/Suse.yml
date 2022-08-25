@@ -1,0 +1,9 @@
+---
+- name: "Ensure binary dependency is installed | {{ __k4k8s_deploy_bin_pkg__ }}"
+  ansible.builtin.package:
+    name: "{{ __k4k8s_deploy_bin_pkg__ }}"
+    state: "present"
+  become: true
+  register: "__k4k8s_deploy_pkg_install_result__"
+  retries: 3
+  until: "__k4k8s_deploy_pkg_install_result__ is success"

@@ -1,0 +1,43 @@
+---
+- name: "Validate deployment"
+  module_defaults:
+    kubernetes.core.k8s_info:
+      wait: true
+      wait_timeout: 600
+      kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+      context: "{{ k4k8s_cluster_context | default(omit) }}"
+      namespace: "{{ k4k8s_cm_namespace }}"
+  block:
+    - name: "Collect namespace resource"
+      kubernetes.core.k8s_info:
+        kind: "Namespace"
+        name: "{{ k4k8s_cm_namespace }}"
+      register: "__k4k8s_cm_namespace_results__"
+
+    - name: "Collect route53 issuer secret"
+      kubernetes.core.k8s_info:
+        kind: "Secret"
+        name: "{{ k4k8s_cm_route53_secret_name }}"
+      register: "__k4k8s_cm_cluster_issuer_secret_results__"
+      when: "k4k8s_cm_cluster_issuer_config == 'dns_route53_acme'"
+    
+    - name: "Collect ClusterIssuer"
+      kubernetes.core.k8s_info:
+        kind: "ClusterIssuer"
+        name: "{{ k4k8s_cm_cluster_issuer_name }}"
+      register: "__k4k8s_cm_cluster_issuer_results__"
+    
+    - ansible.builtin.debug:
+        var: "__k4k8s_cm_cluster_issuer_results__"
+
+
+- name: "Full validation"
+  ansible.builtin.assert:
+    that:
+      - "__k4k8s_cm_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_cm_namespace"  # namespace name matches
+ 
+- name: "Route53 secret validation"
+  ansible.builtin.assert:
+    that:
+      - "__k4k8s_cm_cluster_issuer_secret_results__['resources'][0]['data'][k4k8s_cm_route53_secret_access_key_key] | b64decode == k4k8s_cm_route53_secret_access_key"
+  when: "k4k8s_cm_cluster_issuer_config == 'dns_route53_acme'"
