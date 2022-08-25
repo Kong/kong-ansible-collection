@@ -1,0 +1,74 @@
+---
+- name: "Ensure external-dns is present"
+  block:
+    - name: "Ensure temporary directory for external-dns common helm values is present"
+      ansible.builtin.tempfile:
+        prefix: "k4k8s_edns_"
+        state: "directory"
+      register: "__k4k8s_edns_values_dir__"
+      changed_when: false
+
+    - name: "Ensure external-dns common helm values are present"
+      ansible.builtin.template:
+        src: "helm_values/common.yaml.j2"
+        dest: "{{ __k4k8s_edns_values_dir__['path'] }}/edns_common.yaml"
+      changed_when: false
+
+    - name: "Ensure external-dns {{ k4k8s_edns_provider }} provider secret is present"
+      ansible.builtin.include_tasks: "providers/{{ k4k8s_edns_provider }}.yml"
+      when: "k4k8s_edns_create_provider_secret | bool"
+
+    - name: "Ensure external-dns values files are set | {{ k4k8s_edns_provider }} secret"
+      ansible.builtin.set_fact:
+        __k4k8s_edns_builtin_values_files__:
+          - "{{ __k4k8s_edns_values_dir__['path'] }}/edns_common.yaml"
+          - "{{ __k4k8s_edns_values_dir__['path'] }}/{{ k4k8s_edns_provider }}.yaml"
+      when: "k4k8s_edns_create_provider_secret | bool"
+
+    - name: "Ensure external-dns common helm values files are set"
+      ansible.builtin.set_fact:
+        __k4k8s_edns_builtin_values_files__:
+          - "{{ __k4k8s_edns_values_dir__['path'] }}/edns_common.yaml"
+      when: "not k4k8s_edns_create_provider_secret | bool"
+
+    # Ensure proper ordering of builtin helm values + user provided helm values to allow for full overrides
+    - name: "Ensure provided external-dns helm values files are applied"
+      ansible.builtin.set_fact:
+        __k4k8s_edns_final_helm_chart_values_files__: "{{ __k4k8s_edns_builtin_values_files__ | union(k4k8s_edns_helm_chart_values_files) }}"
+
+    - name: "Ensure external-dns is present"
+      ansible.builtin.include_role:
+        name: "common/k4k8s_helm"
+        public: true
+      vars:
+        k4k8s_helm_atomic: "{{ k4k8s_edns_helm_atomic }}"
+        k4k8s_helm_binary_path: "{{ k4k8s_edns_helm_binary_path }}"
+        k4k8s_helm_chart_values: "{{ k4k8s_edns_helm_chart_values }}"
+        k4k8s_helm_chart_values_files: "{{ __k4k8s_edns_final_helm_chart_values_files__ }}"
+        k4k8s_helm_chart_values_remote: "{{ k4k8s_edns_helm_chart_values_remote }}"
+        k4k8s_helm_chart_version: "{{ k4k8s_edns_helm_chart_version | default(None) }}"
+        k4k8s_helm_chart_ref: "{{ k4k8s_edns_helm_chart_ref }}"
+        k4k8s_helm_chart_repo_name: "{{ k4k8s_edns_helm_chart_repo_name }}"
+        k4k8s_helm_chart_repo_password: "{{ k4k8s_edns_helm_chart_repo_password | default(None) }}"
+        k4k8s_helm_chart_repo_url: "{{ k4k8s_edns_helm_chart_repo_url }}"
+        k4k8s_helm_chart_repo_username: "{{ k4k8s_edns_helm_chart_repo_username | default(None) }}"
+        k4k8s_helm_component_name: "external-dns"
+        k4k8s_helm_disable_hook: "{{ k4k8s_edns_helm_disable_hook }}"
+        k4k8s_helm_force_reinstall: "{{ k4k8s_edns_helm_force_reinstall }}"
+        k4k8s_helm_release_name: "{{ k4k8s_edns_helm_release_name }}"
+        k4k8s_helm_release_namespace: "{{ k4k8s_edns_namespace }}"
+        k4k8s_helm_replace: "{{ k4k8s_edns_helm_replace }}"
+        k4k8s_helm_update_repo: "{{ k4k8s_edns_helm_update_repo }}"
+        k4k8s_helm_wait: "{{ k4k8s_edns_helm_wait }}"
+
+    - name: "Set collected helm run facts"
+      ansible.builtin.set_fact:
+        __k4k8s_edns_helm_results__: "{{ __k4k8s_helm_results__ }}"
+        __k4k8s_edns_helm_release_values__: "{{ __k4k8s_helm_release_values__ }}"
+
+  always:
+    - name: "Ensure temporary directory for external-dns common values is absent"
+      ansible.builtin.file:
+        path: "{{ __k4k8s_edns_values_dir__['path'] }}"
+        state: "absent"
+      changed_when: false
