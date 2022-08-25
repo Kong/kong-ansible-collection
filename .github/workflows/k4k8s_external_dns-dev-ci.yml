@@ -140,7 +140,7 @@ jobs:
           - "ubuntu2004"
           - "opensuse15"
         dns_provider_config:
-          - "dns"
+          - "aws"
         values_location:
           - "remote_values"
           - "local_values"
