@@ -8,7 +8,7 @@
 
 ## Description
 
-An Ansible role to deploy [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Kubernetes Ingress Controller ingresses and services.  
+An Ansible role to deploy [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Kubernetes Ingress Controller ingresses and Kong Gateway Enterprise services.
 
 ***WIP below here***
 
@@ -29,18 +29,17 @@ An Ansible role to deploy [external-dns](https://github.com/kubernetes-sigs/exte
 5. [Default variables](#default-variables)
     1. [Kubernetes and Red Hat OpenShift variables](#kubernetes-and-red-hat-openshift-variables)
     2. [Helm variables](#helm-variables)
-    3. [Cert-manager ClusterIssuer global variables](#cert-manager-clusterissuer-global-variables)
-        1. [DNS Solver - AWS Route53 integration variables](#dns-solver-aws-route53-integration-variables)
+    3. [ExternalDNS global variables](#externaldns-global-variables)
+    4. [ExternalDNS provider variables](#externaldns-provider-variables)
 6. [Advanced Variables](#advanced-variables)
     1. [Helm](#helm)
-    2. [Cert-manager deployment and configuration](#cert-manager-deployment-and-configuration)
+    2. [Secrets](#secrets)
+        1. [AWS Route53 Secret](#aws-route53-secret)
     3. [Collected result variables and other set facts or variables](#collected-result-variables-and-other-set-facts-or-variables)
 7. [Playbook usage examples and how-to guide](#playbook-usage-examples-and-how-to-guide)
-    1. [Deploy cert-manager with no ClusterIssuer](#deploy-cert-manager-with-no-clusterissuer)
-    2. [Deploy cert-manager ACME HTTP01 solver ClusterIssuer configuration](#deploy-cert-manager-acme-http01-solver-clusterissuer-configuration)
-    3. [Deploy cert-manager ACME DNS01 solver ClusterIssuer configuration](#deploy-cert-manager-acme-dns01-solver-clusterissuer-configuration)
-    4. [Securing Kong Ingresses with cert-manager](#securing-kong-ingresses-with-cert-manager)
-    5. [Exposing and Securing Kong Ingresses for Kong Enterprise Services](#exposing-and-securing-kong-ingresses-for-kong-enterprise-services)
+    1. [Prerequisites for AWS Route53](#prerequisites-for-aws-route53)
+        1. [Deploy external-dns for use with Kong Ingresses with AWS Route53](#deploy-external-dns-for-use-with-kong-ingresses-with-aws-route53)
+        2. [Deploy Kong Gateway and external-dns](#deploy-kong-gateway-and-external-dns)
 8. [License](#license)
 9. [Author](#author)
 
@@ -84,18 +83,29 @@ ansible-galaxy install -r galaxy-requirements.yml
 
 ## Testing and Supported Platforms
 
-WIP
+This Ansible role was validated to function using [`ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_testing.html) and [this](../../.github/workflows/k4k8s_external_dns-ci.yml) GitHub Actions workflow.
+
+The testing targets the latest version of Kubernetes available from [`microk8s`](https://microk8s.io/) a fully compliant and lightweight Kubernetes distribution and Red Hat OpenShift using the [`microshift-aio:latest`](https://microshift.io/) container image.
+
+The testing matrix is validated against the following `ansible-test` containers as target hosts and launched from the default `ansible-test` container:
+
+|Test Container|Python Version|
+|---|---|
+|default|3.10|
+|ubuntu1804|3.6|
+|ubuntu2004|3.8|
+|opensuse15|3.6|
 
 
 ## Default variables
 
-The following tables outline variables available in [defaults/main.yml](defaults/main.yml) and are used to control the behavior of the `kong.kong.k4k8s_cert_manager` Ansible role. They are presented based on how they affect the overall operation of the role's automation.
+The following tables outline variables available in [defaults/main.yml](defaults/main.yml) and are used to control the behavior of the `kong.kong.k4k8s_external_dns` Ansible role. They are presented based on how they affect the overall operation of the role's automation.
 
 
 ### Kubernetes and Red Hat OpenShift variables
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
-|`k4k8s_cm_namespace`|Kubernetes or Red Hat OpenShift namespace to deploy cert-manager to.|string|`"cert-manager"`|yes|
+|`k4k8s_edns_namespace`|Kubernetes or Red Hat OpenShift namespace to deploy external-dns to.|string|`"external-dns"`|yes|
 |`k4k8s_kubeconfig`|Path to kubeconfig to use during Kubernetes and Red Hat OpenShift operations.|string|`None` (unset)|no|
 |`k4k8s_cluster_context`|The Kubernetes or Red Hat OpenShift context to use within the specified or default kubeconfig|string|`None` (unset)|no|
 
@@ -107,42 +117,43 @@ The following tables outline variables available in [defaults/main.yml](defaults
 ### Helm variables
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
-|`k4k8s_cm_helm_chart_values_files`|List of [Helm values files](https://helm.sh/docs/chart_template_guide/values_files/) that modify the deployment of cert-manager. See the available values [here](https://artifacthub.io/packages/helm/cert-manager/cert-manager)|list/array|`[]`|no|
-|`k4k8s_cm_helm_chart_values`|Dictionary of Helm values to apply to the cert-manager Helm charts.  See the available values [here](https://artifacthub.io/packages/helm/cert-manager/cert-manager). Can be used with `k4k8s_cm_helm_chart_values_files`, or alone. If combining with `k4k8s_cm_helm_chart_values_files` these values will be applied last and can override values in your `k4k8s_cm_helm_chart_values_files` via recursive dictionary merges and any lists are replaced with the new value. This is a great way to override a single value or a few. See Ansible's [combine filter documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#combining-hashes-dictionaries) for more clarity on this merge methodology.|dictionary|`{}`|no|
-|`k4k8s_cm_helm_chart_values_remote`|Whether or not the `k4k8s_cm_helm_chart_values_files` should be read from the `{{ inventory_hostname }}` or Ansible control node. Set to `true` when the Helm values files are on the remote `{{ inventory_hostname }}`.|boolean|`false`|yes|
+|`k4k8s_edns_helm_chart_values_files`|List of [Helm values files](https://helm.sh/docs/chart_template_guide/values_files/) that modify the deployment of external-dns. See the available values [here](https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns)|list/array|`[]`|no|
+|`k4k8s_edns_helm_chart_values`|Dictionary of Helm values to apply to the external-dns Helm chart.  See the available values [here](https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns). Can be used with `k4k8s_edns_helm_chart_values_files`, or alone. If combining with `k4k8s_edns_helm_chart_values_files` these values will be applied last and can override values in your `k4k8s_edns_helm_chart_values_files` via recursive dictionary merges and any lists are replaced with the new value. This is a great way to override a single value or a few. See Ansible's [combine filter documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#combining-hashes-dictionaries) for more clarity on this merge methodology.|dictionary|`{}`|no|
+|`k4k8s_edns_helm_chart_values_remote`|Whether or not the `k4k8s_edns_helm_chart_values_files` should be read from the `{{ inventory_hostname }}` or Ansible control node. Set to `true` when the Helm values files are on the remote `{{ inventory_hostname }}`.|boolean|`false`|yes|
 
 **[Table of Contents](#table-of-contents)**
 
 ---
 
 
-### Cert-manager ClusterIssuer global variables
+### ExternalDNS global variables
 
-These variables apply when `k4k8s_cm_create_cluster_issuer: true`.
+The following variables expose several of the most commonly configured external-dns Helm chart values without requiring knowledge of all possible chart configurations.  These
 
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
-|`k4k8s_cm_create_cluster_issuer`|Whether or not to deploy a cert-manager `ClusterIssuer`. The current `ClusterIssuer` configurations available with this Kong for Kubernetes integration leverage the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/). To learn more about the concept of `Issuer` and `ClusterIssuer` resources, see the cert-manager [Issuer Configuration](https://cert-manager.io/docs/configuration/) documentation.|boolean|`false`|yes|
-|`k4k8s_cm_cluster_issuer_config`|Cert-manager must resolve requests for new ACME TLS certificate requests with a "solver".  The certificate `Issuer` or `ClusterIssuer` checks the solver to validate a domain belongs to the requester.  This role currently supports a pre-defined http-based solver for configuration for the ACME protocol that will function with Kong's products, as well as a DNS based solver configuration for AWS Route53 with the ACME protocol.  Use the setting value of `"http_acme"` for the http solver ClusterIssuer configuration.  Use the value of `dns_route53_acme` for the AWS Route53 DNS solver ClusterIssuer configuration.|string|`"http_acme"`|no|
-|`k4k8s_cm_cluster_issuer_name`|Name of the `ClusterIssuer` Kubernetes or Red Hat OpenShift resource to create|string|`"letsencrypt-prod"`|no|
-|`k4k8s_cm_acme_acct_email_address`|An optional email address to use when requesting certificates via [Let's Encrypt](https://letsencrypt.org/how-it-works/).  This will be used for notifications of expiring certificates.|string|`None` (unset)|no|
-|`k4k8s_cm_acme_server`|The ACME protocol Let's Encrypt server to use when requesting TLS certificates.  This is defaulted to Let's Encrypt's production environment.|string|`"https://acme-v02.api.letsencrypt.org/directory"`|no|
+|`k4k8s_edns_create_provider_secret`|Whether or not to create the Kubernetes or Red Hat OpenShift secret.  It is recommended to set this to `true` and provide your `k4k8s_edns_aws_access_key_id` and `k4k8s_edns_aws_secret_access_key` (via `ansible-vault`) to fully automate the process.  If you wish to create a provider secret out of band, you can alternatively set the Helm chart value of `env` with your own secretRef settings.|boolean|`false`|yes|
+|`k4k8s_edns_provider`|The DNS provider to configure external-dns for.  Currently `aws` (Route53) is the only supported provider with this role.  More providers will be added in the future.|string|`"aws"`|yes|
+|k4k8s_edns_domain_filters|Corresponds to the external-dns Helm chart value `domainFilters` and the command line option `--domain-filter`.  List of possible target zones to limit DNS record management by domain suffixes.|list (array)|`[]`|yes|
+|k4k8s_edns_sync_policy|Corresponds to the external-dns Helm chart value `policy` and command line option `--policy`.  How DNS records are synchronized between sources and provides.  The available values are `sync` or `upsert-only`.  `sync` will perform both creation and deletion of DNS records, while `upsert-only` will only create DNS records.|string|`"upsert-only"`|yes|
+|k4k8s_edns_sync_interval|Corresponds to the external-dns Helm chart value `interval` and command line option `--interval`.  How often to synchronize DNS updates with the DNS provider.|string|`"1m"`|yes|
+|k4k8s_edns_txt_owner_id|Adds a `external-dns/owner=` field to TXT records within the DNS provider, which can help with identification of which external-dns instance created a record.|string|`""`|yes|
+|k4k8s_edns_txt_prefix|Adds a prefix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
+|k4k8s_edns_txt_suffix|Adds a suffix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
 
 **[Table of Contents](#table-of-contents)**
 
 ---
 
 
-#### DNS Solver - AWS Route53 integration variables
+### ExternalDNS provider variables
 
-These variables apply when `k4k8s_cm_create_cluster_issuer: true` and `k4k8s_cm_solver: "dns_route53"` are set.  Currently this integration is configured to use a programatic AWS IAM user and role with appropriate [Route53 permissions](https://cert-manager.io/docs/configuration/acme/dns01/route53/#set-up-an-iam-role).  While more providers may be added in the future, if you have an immediate need, please file a new [issue](https://github.com/Kong/kong-ansible-collection/issues).  Pull requests are also welcome, if you would like to add in additional functionality.
+These variables apply when `k4k8s_edns_create_provider_secret: true`.
 
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
-|`k4k8s_cm_route53_access_key_id`|Your AWS programatic IAM user access key ID for use with cert-manager.|string|`""`|no|
-|`k4k8s_cm_route53_secret_access_key`|Your AWS programatic IAM user secret access key for use with cert-manager.  This will be stored in a Kubernetes or Red Hat OpenShift secret.|string|`""`|no|
-|`k4k8s_cm_route53_region`|It is required to specify an AWS region which is used when authenticating to AWS via cert-manager for modifying temporary Route53 records.|string|`""`|no|
-|`k4k8s_cm_route53_dns_zones`|List of AWS Route53 DNS hosted zones.  See [DNS Zones](https://cert-manager.io/docs/configuration/acme/#dns-zones) in the cert-manager documentation for more details.|list/array|`[]`|no|
+|`k4k8s_edns_aws_access_key_id`|The AWS access key ID that corresponds to the `k4k8s_edns_aws_secret_access_key` for the AWS IAM programmatic account with access to manage your AWS Route53 records.  This should be provided by a secure mechanism such as `ansible-vault`.|
+|`k4k8s_edns_aws_secret_access_key`|The AWS secret access key that corresponds to the `k4k8s_edns_aws_access_key_id` for the AWS IAM programmatic account with access to manage your AWS Route53 records.  This should be provided by a secure mechanism such as `ansible-vault`.|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -158,34 +169,38 @@ The variables defined in the sections below are available for deeper configurati
 
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
-|`k4k8s_cm_helm_atomic`|Equivalent to the `helm` `--atomic` option.|boolean|`false`|no|
-|`k4k8s_cm_helm_binary_path`|Path to the `helm` executable.|string|`"helm"`|no|
-|`k4k8s_cm_helm_chart_ref`|The Helm chart name to use to deploy cert-manager to Kubernetes or Red Hat OpenShift clusters.|string|`"jetstack/cert-manager"`|no|
-|`k4k8s_cm_helm_chart_repo_name`|Name to install the Helm chart repository as.|string|`"jetstack"`|no|
-|`k4k8s_cm_helm_chart_repo_url`|URL for cert-manager's helm chart repository.|string|`"https://charts.jetstack.io"`|no|
-|`k4k8s_cm_helm_chart_repo_username`|Username for helm chart access.|string|`None` (omitted)|no|
-|`k4k8s_cm_helm_chart_repo_password`|Password for helm chart access.|string|`None` (omitted)|no|
-|`k4k8s_cm_helm_chart_version`|Use if you need a particular Kong Helm Chart version, otherwise the latest chart will be used.|string|`"v1.8.2"`|no|
-|`k4k8s_cm_helm_disable_hook`|Corresponds to the `helm` `--no-hooks` option.|boolean|`false`|no|
-|`k4k8s_cm_helm_force_reinstall`|Helm option to force reinstall, ignore on new install.|boolean|`False`|no|
-|`k4k8s_cm_helm_release_name`|Name of the helm release.|string|`"cert-manager"`|no|
-|`k4k8s_cm_helm_replace`|Corresponds to the `helm` `--replace` option.|boolean|`false`|no|
-|`k4k8s_cm_helm_update_repo`|Whether or not to update the helm chart repository prior to deployment.  This ensures the latest chart is available.  If a specific chart version is required, set the `k4k8s_cm_helm_chart_version`|boolean|`true`|no|
-|`k4k8s_cm_helm_wait`|Whether or not to wait for the Helm Chart's objects to be successfully deployed and at desired state.|boolean|`true`|no|
+|`k4k8s_edns_helm_atomic`|Equivalent to the `helm` `--atomic` option.|boolean|`false`|no|
+|`k4k8s_edns_helm_binary_path`|Path to the `helm` executable.|string|`"helm"`|no|
+|`k4k8s_edns_helm_chart_ref`|The Helm chart name to use to deploy external-dns to Kubernetes or Red Hat OpenShift clusters.|string|`"external-dns/external-dns"`|no|
+|`k4k8s_edns_helm_chart_repo_name`|Name to install the Helm chart repository as.|string|`"external-dns"`|no|
+|`k4k8s_edns_helm_chart_repo_url`|URL for external-dns's helm chart repository.|string|`"https://kubernetes-sigs.github.io/external-dns/"`|no|
+|`k4k8s_edns_helm_chart_repo_username`|Username for helm chart access.|string|`None` (omitted)|no|
+|`k4k8s_edns_helm_chart_repo_password`|Password for helm chart access.|string|`None` (omitted)|no|
+|`k4k8s_edns_helm_chart_version`|Use if you need a particular external-dns version, otherwise the latest chart will be used.|string|`None` (unset)|no|
+|`k4k8s_edns_helm_disable_hook`|Corresponds to the `helm` `--no-hooks` option.|boolean|`false`|no|
+|`k4k8s_edns_helm_force_reinstall`|Helm option to force reinstall, ignore on new install.|boolean|`False`|no|
+|`k4k8s_edns_helm_release_name`|Name of the helm release.|string|`"external-dns"`|no|
+|`k4k8s_edns_helm_replace`|Corresponds to the `helm` `--replace` option.|boolean|`false`|no|
+|`k4k8s_edns_helm_update_repo`|Whether or not to update the helm chart repository prior to deployment.  This ensures the latest chart is available.  If a specific chart version is required, set the `k4k8s_edns_helm_chart_version`|boolean|`true`|no|
+|`k4k8s_edns_helm_wait`|Whether or not to wait for the Helm Chart's objects to be successfully deployed and at desired state.|boolean|`true`|no|
 
 **[Table of Contents](#table-of-contents)**
 
 ---
 
 
-### Cert-manager deployment and configuration
+### Secrets
+
+The following variables are useful if you would like to modify how the Kubernetes or Red Hat OpenShift external-dns secret is created. You can choose fully ignore these variables and provide your own Helm values for the external-dns Helm chart's `env` value.
 
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
-|`k4k8s_cm_crd_install_url`|URL to install the cert-manager CRDs for Kubernetes or Red Hat OpenShift from.|string|`"https://github.com/cert-manager/cert-manager/releases/download/{{ k4k8s_cm_helm_chart_version }}/cert-manager.crds.yaml"`|no|
-|`k4k8s_cm_crd_names`|Used to perform an idempotency check to verify if the cert-manager CRDs have already been installed on the cluster.|list/array|see [vars/main.yml](https://github.com/Kong/kong-ansible-collection/blob/main/roles/k4k8s_cert_manager/vars/main.yml)|no|
-|`k4k8s_cm_route53_secret_name`|Name of the Kubernetes or Red Hat OpenShift secret to store the AWS Route53 `k4k8s_cm_route53_secret_access_key` in.|string|`"aws-route53-secret-access-key"`|no|
-|`k4k8s_cm_route53_secret_access_key_key`|Name of the dictionary key within the `k4k8s_cm_route53_secret_name` secret to store the `k4k8s_cm_route53_secret_access_key` data in.|string|`"aws-secret-access-key"`|no|
+|k4k8s_edns_provider_secret_name|Name of the secret to create in your `k4k8s_edns_namespace` on your Kubernetes or Red Hat OpenShift cluster.|string|`"external-dns"`|no|
+
+
+#### AWS Route53 Secret
+|k4k8s_edns_aws_access_key_id_key|Name of the key where the AWS access key id will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_access_key_id"`|no|
+|k4k8s_edns_aws_secret_access_key_key|Name of the key where the AWS secret access key will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_secret_access_key"`|no|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -194,12 +209,12 @@ The variables defined in the sections below are available for deeper configurati
 
 ### Collected result variables and other set facts or variables
 
-The following table of variables may be useful for debugging purposes.  You can access them after the `kong.kong.k4k8s-deploy` role has completed its run.  If running the `kong.kong.k4k8s-deploy` role via `ansible.builtin.include_role` you will need to add `public: True` to the module parameters, which allows you to access role variables after they have completed running.
+The following table of variables may be useful for debugging purposes.  You can access them after the `kong.kong.k4k8s_external_dns` role has completed its run.  If running the `kong.kong.k4k8s_external_dns` role via `ansible.builtin.include_role` you will need to add `public: true` to the module parameters, which allows you to access role variables after they have completed running.
 
 |Variable name|Description|
 |---|---|
-|`__k4k8s_cm_helm_results__`|The results collected from applying the cert-manager Helm chart via the `kubernetes.core.helm` Ansible module|
-|`__k4k8s_cm_helm_release_values__`|The combined values from your helm values files and helm values.  This is what gets applied during Helm chart deployment.  Good way to validate your chart values are being read as you expect them to. |
+|`__k4k8s_edns_helm_results__`|The results collected from applying the external-dns Helm chart via the `kubernetes.core.helm` Ansible module|
+|`__k4k8s_edns_helm_release_values__`|The combined values from your helm values files and helm values.  This is what gets applied during Helm chart deployment.  Good way to validate your chart values are being read as you expect them to. |
 
 **[Table of Contents](#table-of-contents)**
 
@@ -208,107 +223,80 @@ The following table of variables may be useful for debugging purposes.  You can 
 
 ## Playbook usage examples and how-to guide
 
+### Prerequisites for AWS Route53
 
-### Deploy cert-manager with no ClusterIssuer
+1. Create an AWS IAM Policy like the example found [here](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#iam-policy).  You may want to further restrict the policy to specific DNS Zones.
+
+1. Create an AWS IAM programmatic user and attach the IAM Policy for external-dns you created to it.
+
+---
+**[Table of Contents](#table-of-contents)**
+
+
+#### Deploy external-dns for use with Kong Ingresses with AWS Route53
 
 ```yaml
 ---
-- name: "Ensure cert-manager is deployed for Kong"
+- name: "Deploy external-dns for Kong with AWS Route53"
   hosts: "localhost"
-  tasks:
-    - name: "Ensure cert-manager is deployed with no ClusterIssuer"
-      ansible.builtin.include_role:
-        name: "kong.kong.k4k8s_cert_manager"
-      vars:
-        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
-```
-
-
-### Deploy cert-manager ACME HTTP01 solver ClusterIssuer configuration
-
-```yaml
----
-- name: "Ensure cert-manager is deployed for Kong with ACME HTTP01 solver ClusterIssuer"
-  hosts: "localhost"
-  tasks:
-    - name: "Ensure cert-manager is deployed with ACME HTTP01 solver ClusterIssuer"
-      ansible.builtin.include_role:
-        name: "kong.kong.k4k8s_cert_manager"
-      vars:
-        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
-        k4k8s_cm_create_cluster_issuer: true
-        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
-        k4k8s_cm_cluster_issuer_config: "http_acme"
-        k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-http"
-        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
-```
-
-
-### Deploy cert-manager ACME DNS01 solver ClusterIssuer configuration
-
-```yaml
----
-- name: "Ensure cert-manager is deployed for Kong with ACME DNS01 solver ClusterIssuer"
-  hosts: "localhost"
+  vars:
+    cluster_name: "my-cluster"
   vars_files:
-    - /path/to/my/ansible_vault.yml
+    - "/path/to/my/ansible/vault.yaml"
   tasks:
-    - name: "Ensure cert-manager is deployed with ACME DNS01 solver ClusterIssuer"
+    - name: "Ensure external-dns with AWS Route53 is present"
       ansible.builtin.include_role:
-        name: "kong.kong.k4k8s_cert_manager"
+        name: "kong.kong.k4k8s_external_dns"
       vars:
         k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
-        k4k8s_cm_create_cluster_issuer: true
-        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
-        k4k8s_cm_cluster_issuer_config: "dns_route53_acme"
-        k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-dns"
-        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
-        k4k8s_cm_route53_access_key_id: "{{ access_key_id_from_ansible_vault }}"
-        k4k8s_cm_route53_secret_access_key: "{{ secret_access_key_id_from_ansible_vault }}"
-        k4k8s_cm_route53_region: "us-east-1"
-        k4k8s_cm_route53_dns_zones:
-          - "demo.mydomain.com"
-          - "mydomain.com"
-          - "another.domain.com"
+        k4k8s_edns_create_provider_secret: true
+        k4k8s_edns_aws_access_key_id: "{{ aws_access_key_id }}"  # from ansible-vault
+        k4k8s_edns_aws_secret_access_key: "{{ aws_secret_access_key }}"  # from ansible-vault
+        k4k8s_edns_helm_chart_values:
+          extraArgs:
+            - "--aws-prefer-cname"  # Use CNAME's instead of proprietary ALIAS records
+        k4k8s_edns_txt_prefix: "{{ cluster_name }}"
+        k4k8s_edns_txt_owner_id: "{{ cluster_name }}"
+        k4k8s_edns_sync_interval: "15m"
+        k4k8s_edns_sync_policy: "sync"  # create and delete DNS records
+        k4k8s_edns_domain_filters:
+          - "example.com"
 ```
 
-### Securing Kong Ingresses with cert-manager
+Once your external-dns instance has been deployed, you can add an annotation such as `external-dns.alpha.kubernetes.io/hostname: myingress.example.com` to your Kubernetes ingresses and services as needed.  
 
-Now that you've deployed cert-manager with one of the examples above, it's time to deploy some TLS certificates.
-
-Requirements:
-  * A `ClusterIssuer` must first be available on the Kubernetes or Red Hat OpenShift cluster.  You can deploy one with this Ansible Role.  See the examples above on how to do this.
-
-1. Edit one of your existing Kong `Ingress` resources and add the annotation `cert-manager.io/cluster-issuer: "letsencrypt-prod"`.  The value of the `cert-manager.io/cluster-issuer` must match one of your `ClusterIssuer`s `metadata.name`.  The default name of the `ClusterIssuer` deployed with this Ansible role is `letsencrypt-prod`.  If you changed your `ClusterIssuer`'s name with the `k4k8s_cm_cluster_issuer_name` variable, then the annotation must match the name of your `ClusterIssuer`.  You can find a full list of supported cert-manager annotations [here](https://cert-manager.io/docs/usage/ingress/#supported-annotations).
-
-1. Your Kong `Ingress` will have a few other fields filled that not only tell Kong Ingress Controller how to operate, but also relate to cert-manager's request process:
-![](docs/img/cert-manager-example.png)
-
-1. Once the changes are applied to the Kong `Ingress` cert-manager will automatically deploy a TLS certificate.
+---
+**[Table of Contents](#table-of-contents)**
 
 
-### Exposing and Securing Kong Ingresses for Kong Enterprise Services
-
-If you make use of the `kong.kong.k4k8s_deploy` role to deploy your Kong Enterprise instances, then you can easily deploy Kong Ingresses with cert-manager certificates.  Here's a simple way to do it without needing to modify a refined Helm values file:
+#### Deploy Kong Gateway and external-dns with AWS Route53
 
 ```yaml
-- name: "Ensure cert-manager is deployed for Kong with ACME DNS01 solver ClusterIssuer"
+- name: "Deploy Kong Gateway and external-dns with AWS Route53"
   hosts: "localhost"
-  vars_files:
-    - /path/to/my/ansible_vault.yml
   vars:
     ingress_dns_zone: "example.com"
-    k4k8s_cm_cluster_issuer_name: "letsencrypt-prod-http"
+    cluster_name: "my-cluster"
+    k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
+  vars_files:
+    - "/path/to/my/ansible/vault.yaml"
   tasks:
-    - name: "Ensure cert-manager is deployed to kong control-plane cluster"
+    - name: "Ensure external-dns with AWS Route53 is present"
       ansible.builtin.include_role:
-        name: "kong.kong.k4k8s_cert_manager"
+        name: "kong.kong.k4k8s_external_dns"
       vars:
-        k4k8s_kubeconfig: "/path/to/my/cluster/kubeconfig"
-        k4k8s_cm_create_cluster_issuer: true
-        k4k8s_cm_acme_acct_email_address: "myemail@mydomain.com"
-        k4k8s_cm_cluster_issuer_config: "http_acme"
-        k4k8s_cm_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+        k4k8s_edns_create_provider_secret: true
+        k4k8s_edns_aws_access_key_id: "{{ aws_access_key_id }}"  # from ansible-vault
+        k4k8s_edns_aws_secret_access_key: "{{ aws_secret_access_key }}"  # from ansible-vault
+        k4k8s_edns_helm_chart_values:
+          extraArgs:
+            - "--aws-prefer-cname"  # Use CNAME's instead of proprietary ALIAS records
+        k4k8s_edns_txt_prefix: "{{ cluster_name }}"
+        k4k8s_edns_txt_owner_id: "{{ cluster_name }}"
+        k4k8s_edns_sync_interval: "15m"
+        k4k8s_edns_sync_policy: "sync"  # create and delete DNS records
+        k4k8s_edns_domain_filters:
+          - "{{ ingress_dns_zone }}"
 
     - name: "Ensure kong control-plane is present and configured"
       ansible.builtin.include_role:
@@ -340,35 +328,26 @@ If you make use of the `kong.kong.k4k8s_deploy` role to deploy your Kong Enterpr
           - "kong-enterprise-values.yaml"
         # the following lets us recycle a common helm values file for multiple kong environments
         k4k8s_deploy_helm_chart_values:
-          admin:
-            ingress:
-              tls: "admin-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"  # produces a certificate secret with name admin-example-com-tls
-              hostname: "admin.{{ ingress_dns_zone }}"  # produces a hostname of admin.example.com
+            admin:
+              ingress:
+                hostname: "admin.{{ ingress_dns_zone }}"
+            manager:
+              ingress:
+                hostname: "manager.{{ ingress_dns_zone }}"
+            portal:
+              ingress:
+                hostname: "portal.{{ ingress_dns_zone }}"
+            portalapi:
+              ingress:
+                hostname: "portalapi.{{ ingress_dns_zone }}"
+            proxy:
               annotations:
-                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"  # adds the ClusterIssuer annotation to the Kong Ingress
-          manager:
-            ingress:
-              tls: "manager-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
-              hostname: "manager.{{ ingress_dns_zone }}"
-              annotations:
-                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
-          portal:
-            ingress:
-              tls: "portal-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
-              hostname: "portal.{{ ingress_dns_zone }}"
-              annotations:
-                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
-          portalapi:
-            ingress:
-              tls: "portalapi-{{ ingress_dns_zone | regex_replace('\\.', '-') }}-tls"
-              hostname: "portalapi.{{ ingress_dns_zone }}"
-              annotations:
-                cert-manager.io/cluster-issuer: "{{ k4k8s_cm_cluster_issuer_name }}"
+                external-dns.alpha.kubernetes.io/hostname: "{{ cluster_name }}.{{ ingress_dns_zone }}"
 ```
 
-In the example above, you will need to create a CNAME DNS record pointing to your Kong proxy service's `LoadBalancer` IP for each of the hostname's in `k4k8s_deploy_helm_chart_values`.  This can be achieved automatically with further automation or [external-dns](https://github.com/kubernetes-sigs/external-dns) running on your cluster and configured for your DNS provider.  
+In the above scenario you would be deploying an all-in-one Kong Enterprise deployment, with Kong Ingress Controller exposing all of your services on the `my-cluster.example.com` proxy (Kong Gateway).  You could reach the Kong Admin API via `admin.example.com`, the Kong Manager UI via `manager.example.com`, the Kong Developer Portal UI via `portal.example.com`, and the Kong Developer Portal API via `portalapi.example.com`.
 
-This, of course, is a more advanced sample and much of this is dependent on your Helm values file settings.  Much of your focus should be on what's being done with the `k4k8s_deploy_helm_chart_values` variable, which will override settings within the `k4k8s_deploy_helm_chart_values_files`, creating Kong `Ingress` resources with cert-manager annotations.
+Again, much of this is dependent on the contents of your [Helm values files for deploying Kong for Kubernetes](https://github.com/Kong/charts/blob/main/charts/kong/README.md).
 
 ---
 **[Table of Contents](#table-of-contents)**
