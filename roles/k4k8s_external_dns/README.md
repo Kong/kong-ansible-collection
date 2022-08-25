@@ -8,9 +8,8 @@
 
 ## Description
 
-An Ansible role to deploy [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Kubernetes Ingress Controller ingresses and Kong Gateway Enterprise services.
+An Ansible role to deploy and configure [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Kubernetes Ingress Controller ingresses and Kong Gateway Enterprise services.
 
-***WIP below here***
 
 ## Table of Contents
 
@@ -31,15 +30,16 @@ An Ansible role to deploy [external-dns](https://github.com/kubernetes-sigs/exte
     2. [Helm variables](#helm-variables)
     3. [ExternalDNS global variables](#externaldns-global-variables)
     4. [ExternalDNS provider variables](#externaldns-provider-variables)
+        1. [AWS Route53 provider secret](#aws-route53-provider-secret)
 6. [Advanced Variables](#advanced-variables)
     1. [Helm](#helm)
-    2. [Secrets](#secrets)
+    2. [ExternalDNS Provider Secret Customization](#externaldns-provider-secret-customization)
         1. [AWS Route53 Secret](#aws-route53-secret)
     3. [Collected result variables and other set facts or variables](#collected-result-variables-and-other-set-facts-or-variables)
 7. [Playbook usage examples and how-to guide](#playbook-usage-examples-and-how-to-guide)
     1. [Prerequisites for AWS Route53](#prerequisites-for-aws-route53)
-        1. [Deploy external-dns for use with Kong Ingresses with AWS Route53](#deploy-external-dns-for-use-with-kong-ingresses-with-aws-route53)
-        2. [Deploy Kong Gateway and external-dns](#deploy-kong-gateway-and-external-dns)
+    2. [Deploy external-dns for use with Kong Ingresses with AWS Route53](#deploy-external-dns-for-use-with-kong-ingresses-with-aws-route53)
+    3. [Deploy Kong Gateway and external-dns with AWS Route53](#deploy-kong-gateway-and-external-dns-with-aws-route53)
 8. [License](#license)
 9. [Author](#author)
 
@@ -134,12 +134,12 @@ The following variables expose several of the most commonly configured external-
 |---|---|---|---|---|
 |`k4k8s_edns_create_provider_secret`|Whether or not to create the Kubernetes or Red Hat OpenShift secret.  It is recommended to set this to `true` and provide your `k4k8s_edns_aws_access_key_id` and `k4k8s_edns_aws_secret_access_key` (via `ansible-vault`) to fully automate the process.  If you wish to create a provider secret out of band, you can alternatively set the Helm chart value of `env` with your own secretRef settings.|boolean|`false`|yes|
 |`k4k8s_edns_provider`|The DNS provider to configure external-dns for.  Currently `aws` (Route53) is the only supported provider with this role.  More providers will be added in the future.|string|`"aws"`|yes|
-|k4k8s_edns_domain_filters|Corresponds to the external-dns Helm chart value `domainFilters` and the command line option `--domain-filter`.  List of possible target zones to limit DNS record management by domain suffixes.|list (array)|`[]`|yes|
-|k4k8s_edns_sync_policy|Corresponds to the external-dns Helm chart value `policy` and command line option `--policy`.  How DNS records are synchronized between sources and provides.  The available values are `sync` or `upsert-only`.  `sync` will perform both creation and deletion of DNS records, while `upsert-only` will only create DNS records.|string|`"upsert-only"`|yes|
-|k4k8s_edns_sync_interval|Corresponds to the external-dns Helm chart value `interval` and command line option `--interval`.  How often to synchronize DNS updates with the DNS provider.|string|`"1m"`|yes|
-|k4k8s_edns_txt_owner_id|Adds a `external-dns/owner=` field to TXT records within the DNS provider, which can help with identification of which external-dns instance created a record.|string|`""`|yes|
-|k4k8s_edns_txt_prefix|Adds a prefix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
-|k4k8s_edns_txt_suffix|Adds a suffix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
+|`k4k8s_edns_domain_filters`|Corresponds to the external-dns Helm chart value `domainFilters` and the command line option `--domain-filter`.  List of possible target zones to limit DNS record management by domain suffixes.|list (array)|`[]`|yes|
+|`k4k8s_edns_sync_policy`|Corresponds to the external-dns Helm chart value `policy` and command line option `--policy`.  How DNS records are synchronized between sources and provides.  The available values are `sync` or `upsert-only`.  `sync` will perform both creation and deletion of DNS records, while `upsert-only` will only create DNS records.|string|`"upsert-only"`|yes|
+|`k4k8s_edns_sync_interval`|Corresponds to the external-dns Helm chart value `interval` and command line option `--interval`.  How often to synchronize DNS updates with the DNS provider.|string|`"1m"`|yes|
+|`k4k8s_edns_txt_owner_id`|Adds a `external-dns/owner=` field to TXT records within the DNS provider, which can help with identification of which external-dns instance created a record.|string|`""`|yes|
+|`k4k8s_edns_txt_prefix`|Adds a prefix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
+|`k4k8s_edns_txt_suffix`|Adds a suffix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -150,6 +150,8 @@ The following variables expose several of the most commonly configured external-
 
 These variables apply when `k4k8s_edns_create_provider_secret: true`.
 
+
+#### AWS Route53 provider secret
 |Variable name|Description|Variable type|Default value|Required|
 |---|---|---|---|---|
 |`k4k8s_edns_aws_access_key_id`|The AWS access key ID that corresponds to the `k4k8s_edns_aws_secret_access_key` for the AWS IAM programmatic account with access to manage your AWS Route53 records.  This should be provided by a secure mechanism such as `ansible-vault`.|
@@ -189,9 +191,9 @@ The variables defined in the sections below are available for deeper configurati
 ---
 
 
-### Secrets
+### ExternalDNS Provider Secret Customization
 
-The following variables are useful if you would like to modify how the Kubernetes or Red Hat OpenShift external-dns secret is created. You can choose fully ignore these variables and provide your own Helm values for the external-dns Helm chart's `env` value.
+The following variables are useful if you would like to modify how the Kubernetes or Red Hat OpenShift external-dns secret is created. You can choose fully ignore these variables and provide your own Helm values for the external-dns Helm chart's `env` value if desired.  These only apply when `k4k8s_edns_create_provider_secret: true`.
 
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
@@ -199,8 +201,13 @@ The following variables are useful if you would like to modify how the Kubernete
 
 
 #### AWS Route53 Secret
-|k4k8s_edns_aws_access_key_id_key|Name of the key where the AWS access key id will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_access_key_id"`|no|
-|k4k8s_edns_aws_secret_access_key_key|Name of the key where the AWS secret access key will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_secret_access_key"`|no|
+
+The following variables only apply if `k4k8s_edns_create_provider_secret: true` and `k4k8s_edns_provider: "aws"`.
+
+| Variable name | Description | Variable type | Default value | Required |
+| --- | --- | --- | --- | --- |
+|`k4k8s_edns_aws_access_key_id_key`|Name of the key where the AWS access key id will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_access_key_id"`|no|
+|`k4k8s_edns_aws_secret_access_key_key`|Name of the key where the AWS secret access key will be stored within the `k4k8s_edns_provider_secret_name` secret.|string|`"aws_secret_access_key"`|no|
 
 **[Table of Contents](#table-of-contents)**
 
@@ -233,7 +240,7 @@ The following table of variables may be useful for debugging purposes.  You can 
 **[Table of Contents](#table-of-contents)**
 
 
-#### Deploy external-dns for use with Kong Ingresses with AWS Route53
+### Deploy external-dns for use with Kong Ingresses with AWS Route53
 
 ```yaml
 ---
@@ -269,7 +276,7 @@ Once your external-dns instance has been deployed, you can add an annotation suc
 **[Table of Contents](#table-of-contents)**
 
 
-#### Deploy Kong Gateway and external-dns with AWS Route53
+### Deploy Kong Gateway and external-dns with AWS Route53
 
 ```yaml
 - name: "Deploy Kong Gateway and external-dns with AWS Route53"
