@@ -52,6 +52,8 @@
       ansible.builtin.include_role:
         name: "common/k4k8s_helm"
         public: true
+        apply:
+          delegate_to: "{{ inventory_hostname }}"
       vars:
         k4k8s_helm_atomic: "{{ k4k8s_edns_helm_atomic }}"
         k4k8s_helm_binary_path: "{{ k4k8s_edns_helm_binary_path }}"
