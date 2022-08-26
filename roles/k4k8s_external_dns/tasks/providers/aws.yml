@@ -5,6 +5,7 @@
     definition: "{{ lookup('template', 'templates/secrets/{{ k4k8s_edns_provider }}.yaml.j2' | from_yaml) }}"
     kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     state: "present"
+  delegate_to: "{{ inventory_hostname }}"
 
 # pre-populates the external-dns chart's 'env' value with the secretRef
 - name: "Ensure external-dns {{ k4k8s_edns_provider }} secret helm values are present"
