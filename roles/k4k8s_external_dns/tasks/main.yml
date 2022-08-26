@@ -8,7 +8,9 @@
     kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
     state: "present"
 
-- name: "Ensure external-dns is present | {% if not k4k8s_edns_helm_chart_values_remote | bool %}local{% else %}remote{% endif %} helm values"
+# due to the potential for helm files on a remote inventory_hostname vs just localhost (control node) we need to
+#   do some delegation depending on the 'k4k8s_edns_helm_chart_values_remote' setting
+- name: "Ensure external-dns is present"
   delegate_to: "{% if not k4k8s_edns_helm_chart_values_remote | bool %}localhost{% else %}{{ inventory_hostname }}{% endif %}"
   vars:
     __k4k8s_edns_helm_values_location__: "{% if not k4k8s_edns_helm_chart_values_remote | bool %}local{% else %}remote{% endif %}"
@@ -53,12 +55,12 @@
         name: "common/k4k8s_helm"
         public: true
         apply:
-          delegate_to: "{{ inventory_hostname }}"
+          delegate_to: "{{ inventory_hostname }}" # fixes local vs remote exec issues with remote helm values files
       vars:
         k4k8s_helm_atomic: "{{ k4k8s_edns_helm_atomic }}"
         k4k8s_helm_binary_path: "{{ k4k8s_edns_helm_binary_path }}"
         k4k8s_helm_chart_values: "{{ k4k8s_edns_helm_chart_values }}"
-        k4k8s_helm_chart_values_files: "{{ __k4k8s_edns_final_helm_chart_values_files__ }}"
+        k4k8s_helm_chart_values_files: "{{ __k4k8s_edns_final_helm_chart_values_files__ }}"  # combo of role builtin + user provided
         k4k8s_helm_chart_values_remote: "{{ k4k8s_edns_helm_chart_values_remote }}"
         k4k8s_helm_chart_version: "{{ k4k8s_edns_helm_chart_version | default(None) }}"
         k4k8s_helm_chart_ref: "{{ k4k8s_edns_helm_chart_ref }}"
