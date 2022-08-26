@@ -5,7 +5,7 @@ name: k4k8s_cert_manager
     branches:
       - "main"
     paths:
-      - ".github/workflows/k4k8s_cert_manager-dev-ci.yml"
+      - ".github/workflows/k4k8s_cert_manager-ci.yml"
       - "roles/k4k8s_cert_manager/**"
       - "!roles/k4k8s_cert_manager/galaxy_requirements.yml"
       - "!roles/k4k8s_cert_manager/requirements.txt"
