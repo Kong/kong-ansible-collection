@@ -5,7 +5,7 @@ name: k4k8s_external_dns
     branches:
       - "main"
     paths:
-      - ".github/workflows/k4k8s_external_dns-dev-ci.yml"
+      - ".github/workflows/k4k8s_external_dns-ci.yml"
       - "roles/k4k8s_external_dns/**"
       - "!roles/k4k8s_external_dns/galaxy_requirements.yml"
       - "!roles/k4k8s_external_dns/requirements.txt"
