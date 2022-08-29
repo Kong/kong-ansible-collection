@@ -7,7 +7,7 @@
 
 ## Description
 
-An Ansible role to install Helm chart repositories and Helm charts via roles within the kong.kong Ansible collection.  This is not intended to be directly included in a playbook.
+An Ansible role to install Helm chart repositories and Helm charts via roles within the `kong.kong` Ansible collection.  This is not intended to be directly included in a playbook since it's a library for the Kong collection, but if you'd like to, you can reference it by `kong.kong.common.k4k8s_helm`.  If referencing the role from within a collection role, it can be referenced as `common/k4k8s_helm`.
 
 
 ## Table of Contents
