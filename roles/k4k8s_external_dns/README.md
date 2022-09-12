@@ -139,7 +139,6 @@ The following variables expose several of the most commonly configured external-
 |`k4k8s_edns_sync_interval`|Corresponds to the external-dns Helm chart value `interval` and command line option `--interval`.  How often to synchronize DNS updates with the DNS provider.|string|`"1m"`|yes|
 |`k4k8s_edns_txt_owner_id`|Adds a `external-dns/owner=` field to TXT records within the DNS provider, which can help with identification of which external-dns instance created a record.|string|`""`|yes|
 |`k4k8s_edns_txt_prefix`|Adds a prefix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
-|`k4k8s_edns_txt_suffix`|Adds a suffix to the name of each TXT record created within the DNS provider.  Useful for identification of which external-dns instance created a record within a domain.|string|`""`|yes|
 
 **[Table of Contents](#table-of-contents)**
 
