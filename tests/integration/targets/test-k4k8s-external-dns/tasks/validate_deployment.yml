@@ -37,6 +37,12 @@
   ansible.builtin.assert:
     that:
       - "__k4k8s_edns_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_edns_namespace"  # namespace name matches
+      - "'--interval='k4k8s_edns_sync_interval in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_sync_interval
+      - "'--policy='k4k8s_edns_sync_policy in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_sync_policy
+      - "'--txt-owner-id='k4k8s_edns_txt_owner_id in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_txt_owner_id
+      - "'--txt-prefix='k4k8s_edns_txt_prefix in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_txt_prefix
+      - "'--domain-filter='k4k8s_edns_domain_filters[0] __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of domain filter
+      - "'--provider='k4k8s_edns_provider in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of provider setting
 
 # - name: "Route53 secret validation"
 #   ansible.builtin.assert:
