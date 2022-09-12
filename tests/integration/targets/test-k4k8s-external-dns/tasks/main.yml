@@ -80,6 +80,8 @@
   ansible.builtin.include_role:
     name: "k4k8s_external_dns"
     public: true # so we can validate using the same role variables later
+  vars:
+    k4k8s_edns_provider: "{{ dns_provider_config }}" # pass from the GH actions matrix to the test
 
-# - name: "Validate deployment"
-#   ansible.builtin.include_tasks: "validate_deployment.yml"
+- name: "Validate deployment"
+  ansible.builtin.include_tasks: "validate_deployment.yml"
