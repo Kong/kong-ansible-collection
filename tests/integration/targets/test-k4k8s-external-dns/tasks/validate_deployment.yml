@@ -41,10 +41,11 @@
       - "'--policy={{ k4k8s_edns_sync_policy }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_sync_policy
       - "'--txt-owner-id={{ k4k8s_edns_txt_owner_id }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_txt_owner_id
       - "'--txt-prefix={{ k4k8s_edns_txt_prefix }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_txt_prefix
-      - "'--domain-filter={{ k4k8s_edns_domain_filters[0] }}' __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of domain filter
+      - "'--domain-filter={{ k4k8s_edns_domain_filters[0] }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of domain filter
       - "'--provider={{ k4k8s_edns_provider }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of provider setting
   when:
     - "k4k8s_edns_provider == 'aws'"
+
 
 - name: "Provider secret validation | AWS Route53"
   ansible.builtin.assert:
@@ -52,6 +53,12 @@
       - "__k4k8s_edns_provider_secret_results__['resources'][0]['metadata']['name'] == k4k8s_edns_provider_secret_name" # name of secret matches
       - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_access_key_id_key] == k4k8s_edns_aws_access_key_id | b64decode" # Test that the base64 decoded aws access key matches
       - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_secret_access_key_key] == k4k8s_edns_aws_secret_access_key | b64decode"
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['name'] == 'AWS_ACCESS_KEY_ID'" # validate env var AWS_ACCESS_KEY_ID set
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['valueFrom']['secretKeyRef']['key'] == k4k8s_edns_aws_access_key_id_key"  # deployment AWS_ACCESS_KEY_ID env var data key matches template
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['valueFrom']['secretKeyRef']['name'] == k4k8s_edns_provider_secret_name" # deployment AWS_ACCESS_KEY_ID secret name matches
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][1]['name'] == 'AWS_SECRET_ACCESS_KEY'" # deployment env var AWS_SECRET_ACCESS_KEY set
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][1]['valueFrom']['secretKeyRef']['key'] == k4k8s_edns_aws_secret_access_key_key" # deployment AWS_SECRET_ACCESS_KEY env var data key matches template
+      - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][1]['valueFrom']['secretKeyRef']['name'] == k4k8s_edns_provider_secret_name" # deployment AWS_SECRET_ACCESS_KEY secret name matches
   when:
     - "k4k8s_edns_create_provider_secret | bool"
     - "k4k8s_edns_provider == 'aws'"
