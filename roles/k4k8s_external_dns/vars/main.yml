@@ -1,0 +1,22 @@
+# helm
+k4k8s_edns_helm_binary_path: "helm"
+# k4k8s_edns_helm_chart_repo_username: ""
+# k4k8s_edns_helm_chart_repo_password: ""
+k4k8s_edns_helm_atomic: false
+k4k8s_edns_helm_chart_ref: "external-dns/external-dns"
+# k4k8s_edns_helm_chart_version: "1.11.0"
+k4k8s_edns_helm_disable_hook: false
+k4k8s_edns_helm_force_reinstall: false
+k4k8s_edns_helm_release_name: "external-dns"
+k4k8s_edns_helm_replace: false
+k4k8s_edns_helm_update_repo: true
+k4k8s_edns_helm_wait: true
+k4k8s_edns_helm_chart_repo_url: "https://kubernetes-sigs.github.io/external-dns/"
+k4k8s_edns_helm_chart_repo_name: "external-dns"
+
+# secrets
+k4k8s_edns_provider_secret_name: "external-dns"
+
+# AWS Route53 secret
+k4k8s_edns_aws_access_key_id_key: "aws_access_key_id"
+k4k8s_edns_aws_secret_access_key_key: "aws_secret_access_key"

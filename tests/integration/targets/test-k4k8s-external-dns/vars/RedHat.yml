@@ -1,0 +1,14 @@
+---
+k4k8s_deploy_bin_pkgs: []
+
+k4k8s_deploy_install_pkg_repos: []
+  # - name: "kubernetes"
+  #   description: "Kubernetes"
+  #   async: False
+  #   baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+  #   enabled: True
+  #   file: "kubernetes"
+  #   gpgcheck: False # hit intermittent issues with installs due to: https://github.com/kubernetes/kubernetes/issues/60134
+  #   gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+  #   repo_gpgcheck: False # hit intermittent issues with installs due to: https://github.com/kubernetes/kubernetes/issues/60134
+  #   state: "present"

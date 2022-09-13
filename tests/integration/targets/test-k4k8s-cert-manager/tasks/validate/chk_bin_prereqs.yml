@@ -1,0 +1,18 @@
+---
+# check for binary dependencies
+- name: "Validate binary is installed | {{ __k4k8s_deploy_bin__ }}"
+  ansible.builtin.command: "which {{ __k4k8s_deploy_bin__ }}"
+  ignore_errors: true
+  changed_when: false
+  register: "__k4k8s_deploy_binary_install_status__"
+
+- name: "Append to failed binary validation list"
+  when: "__k4k8s_deploy_binary_install_status__ is failed"
+  block:
+    - name: "Set missing binary value"
+      ansible.builtin.set_fact:
+        __k4k8s_deploy_bin_item__: ["{{ __k4k8s_deploy_bin__ }}"]
+
+    - name: "Update missing binary list"
+      ansible.builtin.set_fact:
+        __k4k8s_deploy_binary_chk__: "{{ __k4k8s_deploy_binary_chk__ | union(__k4k8s_deploy_bin_item__) }}"

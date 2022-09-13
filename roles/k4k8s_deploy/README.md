@@ -91,7 +91,6 @@ The testing matrix is validated against the following `ansible-test` containers 
 |Test Container|Python Version|
 |---|---|
 |default|3.10|
-|centos8|3.6|
 |ubuntu1804|3.6|
 |ubuntu2004|3.8|
 |opensuse15|3.6|
@@ -123,8 +122,8 @@ The following variables apply only when `k4k8s_deploy_method: "helm"` is set (de
 
 | Variable name | Description | Variable type | Default value | Required |
 | --- | --- | --- | --- | --- |
-|`k4k8s_deploy_helm_chart_values_files`|Array/list of Helm values files to apply to the [Kong Helm charts](https://github.com/Kong/charts).  If combining with `k4k8s_deploy_helm_chart_values`, these will be applied first and can be overriden by values in your `k4k8s_deploy_helm_chart_values`. The order of your list is the order the values will be applied in, much like providing the `-f` option multiple times with Helm.|list (array)|`[]`|no|
-|`k4k8s_deploy_helm_chart_values_remote`|Whether or not the `k4k8s_deploy_helm_chart_values_files` should be read from the `{{ inventory_hostname }}` or Ansible control node. Set to `True` when the Helm values files are on the `{{ inventory_hostname }}`.|boolean|`False`|no|
+|`k4k8s_deploy_helm_chart_values_files`|Array/list of Helm values files to apply to the [Kong Helm charts](https://github.com/Kong/charts).  If combining with `k4k8s_deploy_helm_chart_values`, these will be applied first and can be overridden by values in your `k4k8s_deploy_helm_chart_values`. The order of your list is the order the values will be applied in, much like providing the `-f` option multiple times with Helm.|list (array)|`[]`|no|
+|`k4k8s_deploy_helm_chart_values_remote`|Whether or not the `k4k8s_deploy_helm_chart_values_files` should be read from the `{{ inventory_hostname }}` or Ansible control node. Set to `true` when the Helm values files are on the `{{ inventory_hostname }}`.|boolean|`false`|no|
 |`k4k8s_deploy_helm_chart_values`|Dictionary of Helm values to apply to the [Kong Helm charts](https://github.com/Kong/charts).  Can be used with `k4k8s_deploy_helm_chart_values_files`, or alone. If combining with `k4k8s_deploy_helm_chart_values_files` these values will be applied last and can override values in your `k4k8s_deploy_helm_chart_values_files` via **recursive dictionary merges** and any lists are replaced with the new value. This is a great way to override a single value or a few.  See Ansible's [combine filter documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#combining-hashes-dictionaries) for more clarity on this merge methodology.|dictionary|`{}`|no|
 
 **[Table of Contents](#table-of-contents)**

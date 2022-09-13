@@ -1,0 +1,25 @@
+---
+- name: "Ensure apt repositories and keys are present"
+  become: true
+  block:
+    - name: "Ensure apt repository keys are present"
+      ansible.builtin.apt_key:
+        id: "{{ repo.apt_key_id }}"
+        keyring: "{{ repo.apt_key_keyring }}"
+        url: "{{ repo.apt_key_url }}"
+        validate_certs: "{{ repo.validate_certs }}"
+        state: "{{ repo.state }}"
+      with_items: "{{ k4k8s_deploy_install_pkg_repos }}"
+      loop_control:
+        loop_var: "repo"
+
+    - name: "Ensure apt repositories are present"
+      ansible.builtin.apt_repository:
+        filename: "{{ repo.filename }}"
+        repo: "{{ repo.repo }}"
+        state: "{{ repo.state }}"
+        update_cache: "{{ repo.update_cache }}"
+        validate_certs: "{{ repo.validate_certs }}"
+      with_items: "{{ k4k8s_deploy_install_pkg_repos }}"
+      loop_control:
+        loop_var: "repo"

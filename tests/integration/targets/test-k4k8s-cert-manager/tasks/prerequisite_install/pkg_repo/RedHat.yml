@@ -1,0 +1,17 @@
+---
+- name: "Ensure package repositories are present"
+  ansible.builtin.yum_repository:
+    async: "{{ repo.async }}"
+    baseurl: "{{ repo.baseurl }}"
+    description: "{{ repo.description }}"
+    enabled: "{{ repo.enabled }}"
+    file: "{{ repo.file }}"
+    gpgcheck: "{{ repo.gpgcheck }}"
+    gpgkey: "{{ repo.gpgkey }}"
+    name: "{{ repo.name }}"
+    repo_gpgcheck: "{{ repo.repo_gpgcheck }}"
+    state: "{{ repo.state }}"
+  with_items: "{{ k4k8s_deploy_install_pkg_repos }}"
+  loop_control:
+    loop_var: "repo"
+  become: true

@@ -1,0 +1,10 @@
+---
+- name: "Ensure remote {{ k4k8s_helm_component_name }} helm value file values are set | remote"
+  ansible.builtin.slurp:
+    src: "{{ __k4k8s_remote_helm_value_file__ }}"
+  register: "__k4k8s_helm_slurped_values__"
+
+- name: "Ensure {{ k4k8s_helm_component_name }} helm values are available | remote"
+  ansible.builtin.set_fact:
+    "__k4k8s_helm_release_values__": "{{ __k4k8s_helm_release_values__ | combine(__k4k8s_helm_slurped_values__['content'] |
+                                              b64decode | from_yaml) }}"

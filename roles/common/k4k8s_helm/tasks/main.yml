@@ -1,0 +1,6 @@
+---
+- name: "Ensure {{ k4k8s_helm_component_name }} helm chart repository is present"
+  ansible.builtin.include_tasks: "helm_repo.yml"
+
+- name: "Ensure {{ k4k8s_helm_component_name }} is present"
+  ansible.builtin.include_tasks: "helm_chart.yml"

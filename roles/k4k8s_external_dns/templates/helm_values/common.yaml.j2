@@ -1,0 +1,12 @@
+---
+provider: "{{ k4k8s_edns_provider }}"
+{% if k4k8s_edns_domain_filters | length > 0 %}
+domainFilters:
+{% for i in k4k8s_edns_domain_filters %}
+  - {{ i }}
+{% endfor %}
+{% endif %}
+txtOwnerId: "{{ k4k8s_edns_txt_owner_id }}"
+txtPrefix: "{{ k4k8s_edns_txt_prefix }}"
+policy: "{{ k4k8s_edns_sync_policy }}"
+interval: "{{ k4k8s_edns_sync_interval }}"

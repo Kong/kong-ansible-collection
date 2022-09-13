@@ -1,0 +1,25 @@
+---
+- name: "Ensure cert-manager AWS Route53 secret is present"
+  kubernetes.core.k8s:
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
+    definition: "{{ lookup('template', 'templates/secrets/route53_secret.yaml.j2' | from_yaml) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    state: "present"
+  when: 
+    - "k4k8s_cm_route53_access_key_id != ''"
+    - "k4k8s_cm_route53_secret_access_key != ''"
+
+- name: "Ensure cert-manager cluster issuer configuration is present | AWS Route53"
+  kubernetes.core.k8s:
+    context: "{{ k4k8s_cluster_context | default(omit) }}"
+    definition: "{{ lookup('template', 'templates/cluster_issuer_dns_route53_acme.yaml.j2' | from_yaml) }}"
+    kubeconfig: "{{ k4k8s_kubeconfig | default(omit) }}"
+    state: "present"
+  when: 
+    - "k4k8s_cm_route53_dns_zones | length > 0"
+    - "k4k8s_cm_route53_region != ''"
+    - "k4k8s_cm_cluster_issuer_name != ''"
+    - "k4k8s_cm_acme_server != ''"
+    - "k4k8s_cm_route53_access_key_id != ''"
+    - "k4k8s_cm_route53_secret_name != ''"
+    - "k4k8s_cm_route53_secret_access_key_key != ''"

@@ -1,0 +1,11 @@
+---
+- name: "Validate python module is installed | {{ __k4k8s_deploy_python_module__ }}"
+  when: "__k4k8s_deploy_python_module__ not in __k4k8s_deploy_python_pkgs__"
+  block:
+    - name: "Set missing python module value"
+      ansible.builtin.set_fact:
+        __k4k8s_deploy_python_module_item__: ["{{ __k4k8s_deploy_python_module__ }}"]
+
+    - name: "Append to failed python module validation list"
+      ansible.builtin.set_fact:
+        __k4k8s_deploy_python_chk__: "{{ __k4k8s_deploy_python_chk__ | union(__k4k8s_deploy_python_module_item__) }}"

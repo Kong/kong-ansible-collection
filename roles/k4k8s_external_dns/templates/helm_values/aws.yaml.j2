@@ -1,0 +1,12 @@
+---
+env:
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: "{{ k4k8s_edns_provider_secret_name }}"
+        key: "{{ k4k8s_edns_aws_access_key_id_key }}"
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: "{{ k4k8s_edns_provider_secret_name }}"
+        key: "{{ k4k8s_edns_aws_secret_access_key_key }}"
