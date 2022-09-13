@@ -33,7 +33,7 @@
     - ansible.builtin.debug:
         var: "__k4k8s_edns_deployment_results__"
 
-- name: "Full validation"
+- name: "Full validation | AWS Route53"
   ansible.builtin.assert:
     that:
       - "__k4k8s_edns_namespace_results__['resources'][0]['metadata']['name'] == k4k8s_edns_namespace"  # namespace name matches
@@ -43,9 +43,15 @@
       - "'--txt-prefix={{ k4k8s_edns_txt_prefix }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of k4k8s_edns_txt_prefix
       - "'--domain-filter={{ k4k8s_edns_domain_filters[0] }}'' __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of domain filter
       - "'--provider={{ k4k8s_edns_provider }}' in __k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['args']" # test of provider setting
+  when:
+    - "k4k8s_edns_provider == 'aws'"
 
-# - name: "Route53 secret validation"
-#   ansible.builtin.assert:
-#     that:
-#       - "__k4k8s_cm_cluster_issuer_secret_results__['resources'][0]['data'][k4k8s_cm_route53_secret_access_key_key] | b64decode == k4k8s_cm_route53_secret_access_key"
-#   when: "k4k8s_edns_provider == 'aws'"
+- name: "Provider secret validation | AWS Route53"
+  ansible.builtin.assert:
+    that:
+      - "__k4k8s_edns_provider_secret_results__['resources'][0]['metadata']['name'] == k4k8s_edns_provider_secret_name" # name of secret matches
+      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_access_key_id_key] == k4k8s_edns_aws_access_key_id | b64decode" # Test that the base64 decoded aws access key matches
+      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_secret_access_key_key] == k4k8s_edns_aws_secret_access_key | b64decode"
+  when:
+    - "k4k8s_edns_create_provider_secret | bool"
+    - "k4k8s_edns_provider == 'aws'"
