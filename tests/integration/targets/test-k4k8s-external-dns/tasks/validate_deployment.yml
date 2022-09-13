@@ -51,8 +51,8 @@
   ansible.builtin.assert:
     that:
       - "__k4k8s_edns_provider_secret_results__['resources'][0]['metadata']['name'] == k4k8s_edns_provider_secret_name" # name of secret matches
-      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_access_key_id_key] == k4k8s_edns_aws_access_key_id | b64decode" # Test that the base64 decoded aws access key matches
-      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_secret_access_key_key] == k4k8s_edns_aws_secret_access_key | b64decode"
+      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_access_key_id_key] | b64decode == k4k8s_edns_aws_access_key_id" # Test that the base64 decoded aws access key matches
+      - "__k4k8s_edns_provider_secret_results__['resources'][0]['data'][k4k8s_edns_aws_secret_access_key_key]  | b64decode == k4k8s_edns_aws_secret_access_key"
       - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['name'] == 'AWS_ACCESS_KEY_ID'" # validate env var AWS_ACCESS_KEY_ID set
       - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['valueFrom']['secretKeyRef']['key'] == k4k8s_edns_aws_access_key_id_key"  # deployment AWS_ACCESS_KEY_ID env var data key matches template
       - "__k4k8s_edns_deployment_results__['resources'][0]['spec']['template']['spec']['containers'][0]['env'][0]['valueFrom']['secretKeyRef']['name'] == k4k8s_edns_provider_secret_name" # deployment AWS_ACCESS_KEY_ID secret name matches
