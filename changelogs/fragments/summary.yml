@@ -1,0 +1,4 @@
+release_summary: |
+   | We are adding 2 new integrations to enhance our Kong for Kubernetes deployments.
+   | 1. cert-manager deployment and configuration support has been added with the new kong.kong.k4k8s_cert_manager role.  
+   | 2. external-dns deployment and configuration for AWS Route53 has been added with the new kong.kong.k4k8s_external_dns role.__

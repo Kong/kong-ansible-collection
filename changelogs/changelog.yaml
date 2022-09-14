@@ -1,0 +1,26 @@
+ancestor: null
+releases:
+  1.1.0:
+    changes:
+      major_changes:
+      - Added cert-manager integration role kong.kong.k4k8s_cert_manager
+      - Added cert-manager integration role kong.kong.k4k8s_cert_manager
+      - Added external-dns integration role kong.kong.k4k8s_external_dns
+      - Added external-dns integration role kong.kong.k4k8s_external_dns
+      minor_changes:
+      - Created kong.kong.common.k4k8s_helm collection library role to standardize
+        helm tasks across roles
+      - Refactored kong.kong.k4k8s_deploy to leverage new kong.kong.common.k4k8s_helm
+        role
+      - Removed helm tasks that were migrated to the kong.kong.common.k4k8s_helm role
+      release_summary: "| We are adding 2 new integrations to enhance our Kong for
+        Kubernetes deployments.\n| 1. cert-manager deployment and configuration support
+        has been added with the new kong.kong.k4k8s_cert_manager role.  \n| 2. external-dns
+        deployment and configuration for AWS Route53 has been added with the new kong.kong.k4k8s_external_dns
+        role."
+    fragments:
+    - major.yml
+    - minor.yml
+    - new_features.yml
+    - summary.yml
+    release_date: '2022-09-14'

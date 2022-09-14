@@ -1,0 +1,4 @@
+minor_changes:
+  - Created kong.kong.common.k4k8s_helm collection library role to standardize helm tasks across roles
+  - Refactored kong.kong.k4k8s_deploy to leverage new kong.kong.common.k4k8s_helm role
+  - Removed helm tasks that were migrated to the kong.kong.common.k4k8s_helm role
