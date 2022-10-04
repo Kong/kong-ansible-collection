@@ -11,7 +11,6 @@ options:
     description:
     - The path of a 'inso' CLI to use. 
     version_added: "1.2.0"
-    default: "inso"
     type: path
   config:
     description:
