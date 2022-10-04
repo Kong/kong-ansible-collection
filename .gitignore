@@ -1,2 +1,3 @@
 tests/output/*
 tests/integration/inventory
+*__pycache__*
