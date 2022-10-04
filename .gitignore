@@ -1,3 +1,4 @@
 tests/output/*
 tests/integration/inventory
 *__pycache__*
+.venv
