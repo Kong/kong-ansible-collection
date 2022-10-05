@@ -33,5 +33,11 @@ def build_base_cmd(module):
     if module.params["working_dir"]:
         cmd.append("--workingDir")
         cmd.append(module.params["working_dir"])
+    
+    # ensure no prompting from 'inso' binary
+    cmd.append("--ci")
+
+    # ensure options passed to command are printed in stdout
+    cmd.append("--printOptions")
 
     return cmd
