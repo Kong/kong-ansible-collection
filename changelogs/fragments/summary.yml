@@ -1,4 +1,3 @@
 release_summary: |
-   | We are adding 2 new integrations to enhance our Kong for Kubernetes deployments.
-   | 1. cert-manager deployment and configuration support has been added with the new kong.kong.k4k8s_cert_manager role.  
-   | 2. external-dns deployment and configuration for AWS Route53 has been added with the new kong.kong.k4k8s_external_dns role.__
+   | We are adding modules to be able to natively work with Kong tooling such as Insomnia ('inso') and Kong Gateway declarative configurations (decK): 
+   |     1. inso_generate_config: Generate a configuration for Kong Ingress Controller or Kong Gateway from an OpenAPI spec

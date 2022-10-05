@@ -1,3 +1,2 @@
 major_changes:
-  - Added cert-manager integration role kong.kong.k4k8s_cert_manager
-  - Added external-dns integration role kong.kong.k4k8s_external_dns
+  - Added kong.kong.inso_generate_config module
