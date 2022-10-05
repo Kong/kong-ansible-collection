@@ -23,5 +23,5 @@ options:
     type: path
 
 requirements:
-- "inso (https://docs.insomnia.rest/inso-cli/install)"
+- "L(inso, https://docs.insomnia.rest/inso-cli/install)"
     """
