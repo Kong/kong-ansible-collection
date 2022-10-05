@@ -1,3 +1,6 @@
+# Copyright: Kong Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 COMMON_ARG_SPEC = {
     "binary_path": {"type": "path", "required": False},
     "config": {"type": "path", "required": False},
