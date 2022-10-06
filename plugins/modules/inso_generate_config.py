@@ -102,7 +102,7 @@ EXAMPLES = r'''
 
 - name: "Set the configuration to a variable for further manipulation"
   ansible.builtin.set_fact:
-    deck_config: "deck_config_out.output.configuration | from_yaml"
+    deck_config: "{{ deck_config_out.output.configuration | from_yaml }}"
 '''
 
 RETURN = r'''
