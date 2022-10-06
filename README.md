@@ -14,6 +14,13 @@ A collection of Ansible assets to automate [Kong's](http://www.konghq.com/) port
 
 Click on the name of a collection component within the table below for the full component documentation.
 
+### Modules
+
+|Module name|Description|
+|---|---|
+|[kong.kong.inso_generate_config](https://github.com/Kong/kong-ansible-collection/tree/main/docs/inso_generate_config.md)|Generate Kong Gateway and Kong Ingress Controller configurations from OpenAPI specifications.|
+
+
 ### Roles
 
 |Role name|Description|
