@@ -94,11 +94,15 @@ EXAMPLES = r'''
 - name: "Generate Kong Gateway declarative | no output"
   kong.kong.inso_generate_config:
     identifier: "/path/to/my/oapi_spec.json"
-  register: "deck_config"
+  register: "deck_config_out"
 
 - name: "View the result of inso_generate_config"
   ansible.builtin.debug:
-    var: "deck_config"
+    var: "deck_config_out"
+
+- name: "Set the configuration to a variable for further manipulation"
+  ansible.builtin.set_fact:
+    deck_config: "deck_config_out.output.configuration | from_yaml"
 '''
 
 RETURN = r'''
