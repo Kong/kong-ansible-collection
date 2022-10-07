@@ -8,7 +8,7 @@
 
 ## Description
 
-An Ansible role to deploy [cert-manager](https://cert-manager.io) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of TLS certificates with Kong Kubernetes Ingress Controller ingresses.  The role can optionally currently deploy a cert-manager `ClusterIssuer` for the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/) using either a HTTP01 solver or DNS01 solver.
+An Ansible role to deploy [cert-manager](https://cert-manager.io) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of TLS certificates with Kong Ingress Controller ingresses.  The role can optionally currently deploy a cert-manager `ClusterIssuer` for the [ACME protocol](https://tools.ietf.org/html/rfc8555) via [Let's Encrypt](https://letsencrypt.org/how-it-works/) using either a HTTP01 solver or DNS01 solver.
 
 
 ## Table of Contents

@@ -9,9 +9,9 @@
 
 ## Description
 
-An Ansible role to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, and Kong Kubernetes Ingress Controller to Kubernetes or Red Hat OpenShift clusters.  Product specific documentation can be found within the Kong Kubernetes Ingress Controller documentation pages [here](https://docs.konghq.com/kubernetes-ingress-controller/).
+An Ansible role to deploy Kong for Kubernetes, Kong for Kubernetes Enterprise, Kong for Kubernetes with Kong Enterprise, and Kong Ingress Controller to Kubernetes or Red Hat OpenShift clusters.  Product specific documentation can be found within the Kong Ingress Controller documentation pages [here](https://docs.konghq.com/kubernetes-ingress-controller/).
 
-The Ansible role can currently perform a Helm based or Kubernetes YAML manifest based installation, along with full automation of Kong required secrets for production grade installations.  The role can also take care of installing and verifying the installation of Python module dependencies, Ansible Galaxy Collection dependencies, and binary dependencies if desired (configurable).
+The Ansible role can currently perform a Helm based or Kubernetes YAML manifest based installation, along with full automation of Kong required secrets for production grade installations.  
 
 
 ## Table of Contents

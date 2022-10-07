@@ -8,7 +8,7 @@
 
 ## Description
 
-An Ansible role to deploy and configure [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Kubernetes Ingress Controller ingresses and Kong Gateway Enterprise services.
+An Ansible role to deploy and configure [external-dns](https://github.com/kubernetes-sigs/external-dns) on a Kubernetes or Red Hat OpenShift cluster for the purpose of automated deployment of DNS records with Kong Ingress Controller ingresses and Kong Gateway Enterprise services.
 
 
 ## Table of Contents
