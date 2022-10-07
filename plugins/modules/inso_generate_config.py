@@ -196,6 +196,8 @@ import copy
 
 
 def arguments():
+    # Extending the base command and global (common) arguments
+    ## these are imported from the module util
     spec = copy.deepcopy(COMMON_ARG_SPEC)
     
     spec["format"] = {
