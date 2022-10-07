@@ -304,7 +304,7 @@ def run_module():
             options.append(stdout_lines[i])
         result["log"]["options"] = "".join(options)
     
-    # return changed it command successful
+    # return changed if command successful
     if result["rc"] == 0:
         # no changes made if in check_mode
         if not module.check_mode:
