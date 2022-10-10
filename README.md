@@ -19,6 +19,7 @@ Click on the name of a collection component within the table below for the full 
 |Module name|Description|
 |---|---|
 |[kong.kong.inso_generate_config](https://github.com/Kong/kong-ansible-collection/tree/main/docs/inso_generate_config.md)|Generate Kong Gateway and Kong Ingress Controller configurations from OpenAPI specifications.|
+|[kong.kong.inso_lint_spec](https://github.com/Kong/kong-ansible-collection/tree/main/docs/inso_generate_config.md)|Lint and validate your OpenAPI specifications.|
 
 
 ### Roles
