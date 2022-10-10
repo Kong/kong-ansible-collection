@@ -46,7 +46,7 @@ The `inso_lint_spec` module lints and validates your OpenAPI specification with 
 | Key | Description |
 | --- | --- |
 |changed</br><sub><span style="color:purple">boolean</span></sub>|Whether the module made a change to the system, this will always return 'False'.</br>**Returned:** always|
-|cmd</br><sub><span style="color:purple">list</span> / <span style="color:purple">elements=string</span></span></sub>|The ‘inso’ CLI command and arguments that were run.</br>**Returned:** always</br>**Sample:** <span style="color:blue">[“[\”/usr/local/bin/inso\””, ”\"lint\””, ” \”spec\””, ” \”–ci\””, ” \”–printOptions\””, ” \”my identifier\”]”]</span>|
+|cmd</br><sub><span style="color:purple">list</span> / <span style="color:purple">elements=string</span></span></sub>|The ‘inso’ CLI command and arguments that were run.</br>**Returned:** always</br>**Sample:** <span style="color:blue">[“[\”/usr/local/bin/inso\””, ”\”lint\””, ” \”spec\””, ” \”–ci\””, ” \”–printOptions\””, ” \”my identifier\”]”]</span>|
 |failed</br><sub><span style="color:purple">boolean</span></sub>|Whether the module failed or not.</br>**Returned:** always|
 |log</br><sub><span style="color:purple">complex</span></sub>|Dictionary containing log output from the ‘inso’ CLI run.</br>**Returned:** success|
 |log.options</br><sub><span style="color:purple">string</span></sub>|The ‘inso’ CLI stdout log of options the command was run with.</br>**Returned:** success</br>**Sample:** <span style="color:blue">“[log] Loaded options { ci: true, printOptions: true }”</span>|
