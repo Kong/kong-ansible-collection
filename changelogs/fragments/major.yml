@@ -1,2 +1,3 @@
 major_changes:
   - Added kong.kong.inso_generate_config module
+  - Added kong.kong.inso_lint_spec module
