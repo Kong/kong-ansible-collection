@@ -48,7 +48,6 @@ EXAMPLES = r'''
     var: "openapi_lint_results"
 '''
 
-# TODO
 RETURN = r'''
 changed:
     description: Whether the module made a change to the system, this will always return 'False'
