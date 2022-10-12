@@ -2,3 +2,4 @@ release_summary: |
    | We are adding modules to be able to natively work with Kong tooling such as Insomnia ('inso') and Kong Gateway declarative configurations (decK): 
    |     1. inso_generate_config: Generate a configuration for Kong Ingress Controller or Kong Gateway from an OpenAPI spec
    |     2. inso_lint_spec: Lint and validate your OpenAPI specifications.
+   |     3. inso_run_test: Run Insomnia unit test suites
