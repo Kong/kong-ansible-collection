@@ -201,31 +201,31 @@ def arguments():
     spec = copy.deepcopy(COMMON_ARG_SPEC)
     
     spec["format"] = {
-            "type": "str",
-            "choices": ["yaml", "json"],
-            "required": False
-        }
+        "type": "str",
+        "choices": ["yaml", "json"],
+        "required": False
+    }
 
     spec["identifier"] = {
-            "type": "str",
-            "required": True
-        }
+        "type": "str",
+        "required": True
+    }
 
     spec["output"] = {
-            "type": "path",
-            "required": False
-        }
+        "type": "path",
+        "required": False
+    }
 
     spec["tags"] = {
-            "type": "list",
-            "required": False
-        }
+        "type": "list",
+        "required": False
+    }
 
     spec["type"] = {
-            "type": "str",
-            "choices": ["declarative", "kubernetes"],
-            "required": False
-        }
+        "type": "str",
+        "choices": ["declarative", "kubernetes"],
+        "required": False
+    }
 
     return spec
 

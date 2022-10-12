@@ -121,9 +121,9 @@ def arguments():
     spec = copy.deepcopy(COMMON_ARG_SPEC)
     
     spec["identifier"] = {
-            "type": "str",
-            "required": True
-        }
+        "type": "str",
+        "required": True
+    }
 
     return spec
 
