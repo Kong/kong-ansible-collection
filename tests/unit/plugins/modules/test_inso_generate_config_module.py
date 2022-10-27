@@ -93,7 +93,7 @@ class TestInsoGenerateConfig(TestCase):
         mock_run_command.assert_called_once_with(args=['/usr/bin/inso', 'generate', 'config', 
             '--ci', '--printOptions', '--format', 'json', '--output', 'output.json' ,'spc_46c5a4'], use_unsafe_shell=False)
 
-# Test default command executed, but return a 
+# Test default command executed
     def test_rc_1_thrown(self):
         set_module_args({
             "identifier": "spc_46c5a4", 
@@ -108,6 +108,7 @@ class TestInsoGenerateConfig(TestCase):
             with self.assertRaises(AnsibleFailJson) as result:
                 inso_generate_config.main()
             self.assertFalse(result.exception.args[0]['changed'])
+            self.assertEqual(result.exception.args[0]['rc'], 1)
             
         mock_run_command.assert_called_once_with(args=['/usr/bin/inso', 'generate', 'config', 
             '--ci', '--printOptions', 'spc_46c5a4'], use_unsafe_shell=False)

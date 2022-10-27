@@ -5,7 +5,7 @@ from unittest import TestCase
 from ansible_collections.kong.kong.plugins.modules import inso_generate_config
 
 # Tests Module Arguments onlys
-class TestInsoGenerateConfig(TestCase):
+class TestInsoGenerateConfigArgs(TestCase):
 
 
     def test_format(self):

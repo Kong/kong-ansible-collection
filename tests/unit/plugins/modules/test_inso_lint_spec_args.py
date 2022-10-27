@@ -5,7 +5,7 @@ from unittest import TestCase
 from ansible_collections.kong.kong.plugins.modules import inso_lint_spec
 
 # Tests Module Arguments onlys
-class TestInsoLintSpec(TestCase):
+class TestInsoLintSpecArgs(TestCase):
 
     def test_identifier(self):
         spec = inso_lint_spec.arguments()["identifier"]

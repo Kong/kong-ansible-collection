@@ -51,7 +51,7 @@ class TestInsoLintSpec(TestCase):
         mock_run_command.assert_called_once_with(args=['/usr/bin/inso', 'lint', 'spec',
             '--ci', '--printOptions', 'spc_46c5a4'], use_unsafe_shell=False)
 
-# Test default command executed, but return a 
+# Test default command executed
     def test_rc_1_thrown(self):
         set_module_args({
             "identifier": "spc_46c5a4", 
