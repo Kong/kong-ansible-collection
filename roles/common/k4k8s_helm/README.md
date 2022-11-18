@@ -1,7 +1,7 @@
 # kong.kong.common.k4k8s_helm
 
 <p align="center">
-  <img src="https://2tjosk2rxzc21medji3nfn1g-wpengine.netdna-ssl.com/wp-content/uploads/2018/08/kong-combination-mark-color-256px.png" /></div>
+  <img src="https://konghq.com/wp-content/uploads/2018/08/kong-combination-mark-color-256px.png" /></div>
 </p>
 
 
@@ -26,7 +26,7 @@ An Ansible role to install Helm chart repositories and Helm charts via roles wit
 4. [Default variables](#default-variables)
     1. [Role behavior variables](#role-behavior-variables)
     2. [Kubernetes and Red Hat Open Shift variables](#kubernetes-and-red-hat-open-shift-variables)
-    3. [Helm deployment method variables](#helm-deployment-method-variables)
+    3. [Helm values variables](#helm-values-variables)
 5. [Advanced variables](#advanced-variables)
     1. [Helm](#helm)
     2. [Collected result variables](#collected-result-variables)
