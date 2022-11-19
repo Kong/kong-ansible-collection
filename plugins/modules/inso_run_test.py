@@ -141,7 +141,7 @@ def arguments():
     spec = copy.deepcopy(COMMON_ARG_SPEC)
     spec["bail"] = {
         "type": "bool",
-        "requried": False
+        "required": False
     }
 
     spec["disable_cert_validation"] = {
