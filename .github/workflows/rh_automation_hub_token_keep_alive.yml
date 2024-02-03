@@ -8,6 +8,7 @@ name: "Red Hat Automation Hub - Keep token alive"
 
 jobs:
   keep_rh_sso_token_alive:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: "ubuntu-latest"
     steps:
       - name: "Run curl command"
