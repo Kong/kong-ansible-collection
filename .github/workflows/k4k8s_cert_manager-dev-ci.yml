@@ -41,6 +41,7 @@ env:
 
 jobs:
   ansible-sanity-test:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: "ubuntu-latest"
     defaults:
       run:
@@ -54,6 +55,7 @@ jobs:
         run: ansible-test sanity
   
   openshift-test:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     needs: ansible-sanity-test
     runs-on: "ubuntu-latest"
     strategy:
@@ -137,6 +139,7 @@ jobs:
         run: ansible-test integration --controller docker:default --target docker:${{ matrix.operating_system }} --docker-network "${{ env.DOCKER_NETWORK }}" --color yes --skip-tags "skip_for_test" test-k4k8s-cert-manager
   
   kubernetes-test:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     needs: ansible-sanity-test
     runs-on: "ubuntu-latest"
     strategy:
